@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({

@@ -1,0 +1,3252 @@
+{
+  "requesterUsername": "noodlebarpip",
+  "requesterAvatarIconUri": {
+    "$mid": 1,
+    "path": "/u/212860591",
+    "scheme": "https",
+    "authority": "avatars.githubusercontent.com",
+    "query": "v=4"
+  },
+  "responderUsername": "GitHub Copilot",
+  "responderAvatarIconUri": {
+    "id": "copilot"
+  },
+  "initialLocation": "panel",
+  "requests": [
+    {
+      "requestId": "request_8c8cd672-1b24-45b4-b02e-ccc96e17e892",
+      "message": {
+        "parts": [
+          {
+            "range": {
+              "start": 0,
+              "endExclusive": 79
+            },
+            "editorRange": {
+              "startLineNumber": 1,
+              "startColumn": 1,
+              "endLineNumber": 1,
+              "endColumn": 80
+            },
+            "text": "I need to create an edit button at my graph view so that it changes a json file",
+            "kind": "text"
+          }
+        ],
+        "text": "I need to create an edit button at my graph view so that it changes a json file"
+      },
+      "variableData": {
+        "variables": [
+          {
+            "kind": "file",
+            "id": "vscode.implicit.viewport",
+            "name": "file:useGraph.ts",
+            "value": {
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "scheme": "file"
+              },
+              "range": {
+                "startLineNumber": 63,
+                "startColumn": 1,
+                "endLineNumber": 85,
+                "endColumn": 1
+              }
+            },
+            "modelDescription": "User's current visible code"
+          }
+        ]
+      },
+      "response": [
+        {
+          "value": "To add an **Edit** button to your Graph View that allows editing the JSON file, you need to:\n\n1. **Add an action to your store** for editing JSON.\n2. **Expose the action in your UI** (Graph View).\n3. **Trigger a modal or editor** to update the JSON.\n\n### 1. Add an Edit Action to the Store\n\nAdd a new action in your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "GraphActions",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 45,
+                "startColumn": 11,
+                "endLineNumber": 45,
+                "endColumn": 11
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "ec7e1797-8c17-472e-b464-2c26afe4f7a2"
+        },
+        {
+          "value": " interface and implementation.  \nFor example, add this to your interface:\n\n````typescript\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "// ...existing code...\ninterface GraphActions {\n  // ...existing code...\n  editJson: (newJson: string) => void;\n}\n// ...existing code...\n````\n\nAnd add the implementation:\n\n````typescript\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "// ...existing code...\neditJson: (newJson) => {\n  useJson.getState().setJson(newJson); // assuming setJson exists in useJson\n  get().setGraph(newJson);\n},\n// ...existing code...\n````\n\n### 2. Add the Edit Button to Your Graph View\n\nIn your Graph View component (e.g., `GraphView.tsx`), import the store and add a button:\n\n````tsx\n// ...existing code...\nimport useGraph from \"./stores/useGraph\";\n// ...existing code...\n\nconst GraphView = () => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    // Open a modal or prompt to get new JSON\n    const newJson = window.prompt(\"Edit JSON:\", \"Paste your JSON here\");\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <div>\n      {/* ...existing graph rendering... */}\n      <button onClick={handleEdit}>Edit JSON</button>\n      {/* ...existing code... */}\n    </div>\n  );\n};\n\nexport default GraphView;\n````\n\n### 3. (Optional) Use a Modal or a Better Editor\n\nInstead of `window.prompt`, you can use a modal with a textarea for better UX.\n\n---\n\n**Summary:**  \n- Add `editJson` action to your store.\n- Add an Edit button to your Graph View.\n- On click, show a prompt/modal to edit JSON and update the graph.\n\nLet me know if you want a more advanced modal or code for a specific UI library!",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        }
+      ],
+      "responseId": "response_eca0b0ac-62cb-465c-861c-98fbcc8a232f",
+      "result": {
+        "timings": {
+          "firstProgress": 872,
+          "totalElapsed": 5215
+        },
+        "metadata": {
+          "codeBlocks": [
+            {
+              "code": "// ...existing code...\ninterface GraphActions {\n  // ...existing code...\n  editJson: (newJson: string) => void;\n}\n// ...existing code...\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "scheme": "file"
+              },
+              "language": "typescript",
+              "markdownBeforeBlock": "To add an **Edit** button to your Graph View that allows editing the JSON file, you need to:\n\n1. **Add an action to your store** for editing JSON.\n2. **Expose the action in your UI** (Graph View).\n3. **Trigger a modal or editor** to update the JSON.\n\n### 1. Add an Edit Action to the Store\n\nAdd a new action in your  interface and implementation.  \nFor example, add this to your interface:\n\n"
+            },
+            {
+              "code": "// ...existing code...\neditJson: (newJson) => {\n  useJson.getState().setJson(newJson); // assuming setJson exists in useJson\n  get().setGraph(newJson);\n},\n// ...existing code...\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+                "scheme": "file"
+              },
+              "language": "typescript",
+              "markdownBeforeBlock": "\nAnd add the implementation:\n\n"
+            },
+            {
+              "code": "// ...existing code...\nimport useGraph from \"./stores/useGraph\";\n// ...existing code...\n\nconst GraphView = () => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    // Open a modal or prompt to get new JSON\n    const newJson = window.prompt(\"Edit JSON:\", \"Paste your JSON here\");\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <div>\n      {/* ...existing graph rendering... */}\n      <button onClick={handleEdit}>Edit JSON</button>\n      {/* ...existing code... */}\n    </div>\n  );\n};\n\nexport default GraphView;\n",
+              "language": "tsx",
+              "markdownBeforeBlock": "\n### 2. Add the Edit Button to Your Graph View\n\nIn your Graph View component (e.g., `GraphView.tsx`), import the store and add a button:\n\n"
+            }
+          ],
+          "toolCallRounds": [
+            {
+              "response": "To add an **Edit** button to your Graph View that allows editing the JSON file, you need to:\n\n1. **Add an action to your store** for editing JSON.\n2. **Expose the action in your UI** (Graph View).\n3. **Trigger a modal or editor** to update the JSON.\n\n### 1. Add an Edit Action to the Store\n\nAdd a new action in your `GraphActions` interface and implementation.  \nFor example, add this to your interface:\n\n````typescript\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts\n// ...existing code...\ninterface GraphActions {\n  // ...existing code...\n  editJson: (newJson: string) => void;\n}\n// ...existing code...\n````\n\nAnd add the implementation:\n\n````typescript\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts\n// ...existing code...\neditJson: (newJson) => {\n  useJson.getState().setJson(newJson); // assuming setJson exists in useJson\n  get().setGraph(newJson);\n},\n// ...existing code...\n````\n\n### 2. Add the Edit Button to Your Graph View\n\nIn your Graph View component (e.g., `GraphView.tsx`), import the store and add a button:\n\n````tsx\n// ...existing code...\nimport useGraph from \"./stores/useGraph\";\n// ...existing code...\n\nconst GraphView = () => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    // Open a modal or prompt to get new JSON\n    const newJson = window.prompt(\"Edit JSON:\", \"Paste your JSON here\");\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <div>\n      {/* ...existing graph rendering... */}\n      <button onClick={handleEdit}>Edit JSON</button>\n      {/* ...existing code... */}\n    </div>\n  );\n};\n\nexport default GraphView;\n````\n\n### 3. (Optional) Use a Modal or a Better Editor\n\nInstead of `window.prompt`, you can use a modal with a textarea for better UX.\n\n---\n\n**Summary:**  \n- Add `editJson` action to your store.\n- Add an Edit button to your Graph View.\n- On click, show a prompt/modal to edit JSON and update the graph.\n\nLet me know if you want a more advanced modal or code for a specific UI library!",
+              "toolCalls": [],
+              "toolInputRetry": 0,
+              "id": "64a14a99-82a7-4f03-bce9-2ee875e14177"
+            }
+          ],
+          "modelMessageId": "e2b71994-6ae4-4442-8e52-9a83e5993ba7",
+          "responseId": "d938953e-2d96-4723-be8f-0645d1ee4517",
+          "sessionId": "17490ed5-404d-4769-bb75-5ee5cc3738f9",
+          "agentId": "github.copilot.default"
+        }
+      },
+      "followups": [],
+      "isCanceled": false,
+      "agent": {
+        "extensionId": {
+          "value": "GitHub.copilot-chat",
+          "_lower": "github.copilot-chat"
+        },
+        "publisherDisplayName": "GitHub",
+        "extensionPublisherId": "GitHub",
+        "extensionDisplayName": "GitHub Copilot Chat",
+        "id": "github.copilot.default",
+        "description": "Ask Copilot",
+        "metadata": {
+          "themeIcon": {
+            "id": "copilot"
+          },
+          "hasFollowups": false,
+          "helpTextPrefix": "You can ask me general programming questions, or chat with the following participants which have specialized expertise and can perform actions:",
+          "helpTextVariablesPrefix": "You can also help me understand your question by using the following variables to give me extra context:",
+          "helpTextPostfix": {
+            "value": "To have a great conversation, ask me questions as if I was a real programmer:\n\n* **Show me the code** you want to talk about by having the files open and selecting the most important lines.\n* **Make refinements** by asking me follow-up questions, adding clarifications, providing errors, etc.\n* **Review my suggested code** and tell me about issues or improvements, so I can iterate on it.\n\nYou can also ask me questions about your editor selection by [starting an inline chat session](command:inlineChat.start).\n\nLearn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted) in [Visual Studio Code](https://code.visualstudio.com/docs/copilot/overview). Or explore the [Copilot walkthrough](command:github.copilot.open.walkthrough).",
+            "isTrusted": {
+              "enabledCommands": [
+                "inlineChat.start",
+                "github.copilot.open.walkthrough"
+              ]
+            },
+            "supportThemeIcons": false,
+            "supportHtml": false,
+            "uris": {
+              "command:inlineChat.start": {
+                "$mid": 1,
+                "path": "inlineChat.start",
+                "scheme": "command"
+              },
+              "https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted": {
+                "$mid": 1,
+                "path": "/copilot/using-github-copilot/getting-started-with-github-copilot",
+                "scheme": "https",
+                "authority": "docs.github.com",
+                "query": "tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted"
+              },
+              "https://code.visualstudio.com/docs/copilot/overview": {
+                "$mid": 1,
+                "path": "/docs/copilot/overview",
+                "scheme": "https",
+                "authority": "code.visualstudio.com"
+              },
+              "command:github.copilot.open.walkthrough": {
+                "$mid": 1,
+                "path": "github.copilot.open.walkthrough",
+                "scheme": "command"
+              }
+            }
+          },
+          "supportIssueReporting": false,
+          "requester": {
+            "name": "noodlebarpip",
+            "icon": {
+              "$mid": 1,
+              "path": "/u/212860591",
+              "scheme": "https",
+              "authority": "avatars.githubusercontent.com",
+              "query": "v=4"
+            }
+          }
+        },
+        "name": "GitHubCopilot",
+        "fullName": "GitHub Copilot",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask"
+        ],
+        "slashCommands": [],
+        "disambiguation": [
+          {
+            "category": "generate_code_sample",
+            "description": "The user wants to generate code snippets without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Write an example of computing a SHA256 hash."
+            ]
+          },
+          {
+            "category": "add_feature_to_file",
+            "description": "The user wants to change code in a file that is provided in their request, without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Add a refresh button to the table widget."
+            ]
+          },
+          {
+            "category": "question_about_specific_files",
+            "description": "The user has a question about a specific file or code snippet that they have provided as part of their query, and the question does not require additional workspace context to answer.",
+            "examples": [
+              "What does this file do?"
+            ]
+          }
+        ]
+      },
+      "contentReferences": [
+        {
+          "kind": "reference",
+          "reference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/stores/useGraph.ts",
+            "scheme": "file"
+          }
+        }
+      ],
+      "codeCitations": [],
+      "timestamp": 1753205890967
+    },
+    {
+      "requestId": "request_0adcdeba-6200-4cc7-a6a8-675a1e732f76",
+      "message": {
+        "parts": [
+          {
+            "range": {
+              "start": 0,
+              "endExclusive": 171
+            },
+            "editorRange": {
+              "startLineNumber": 1,
+              "startColumn": 1,
+              "endLineNumber": 5,
+              "endColumn": 14
+            },
+            "text": "at what point does <div>\n      {/* ...existing graph rendering... */}\n      <button onClick={handleEdit}>Edit JSON</button>\n      {/* ...existing code... */}\n    </div> go",
+            "kind": "text"
+          }
+        ],
+        "text": "at what point does <div>\n      {/* ...existing graph rendering... */}\n      <button onClick={handleEdit}>Edit JSON</button>\n      {/* ...existing code... */}\n    </div> go"
+      },
+      "variableData": {
+        "variables": [
+          {
+            "kind": "file",
+            "id": "vscode.implicit.viewport",
+            "name": "file:index.tsx",
+            "value": {
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "range": {
+                "startLineNumber": 180,
+                "startColumn": 1,
+                "endLineNumber": 202,
+                "endColumn": 10
+              }
+            },
+            "modelDescription": "User's current visible code"
+          }
+        ]
+      },
+      "response": [
+        {
+          "value": "You should place the Edit button **inside your main return JSX**, ideally above or below your graph rendering component.  \nIn your case, you can add it **inside the `<StyledEditorWrapper>` but outside the `<Space>`**, so it overlays the graph but is not part of the zoomable/canvas area.\n\nHere’s how you can do it:\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "// ...existing code...\nreturn (\n  <Box pos=\"relative\" h=\"100%\" w=\"100%\">\n    {aboveSupportedLimit && <NotSupported />}\n    <LoadingOverlay visible={debouncedLoading} />\n    {!isWidget && <OptionsMenu />}\n    {!isWidget && <SecureInfo />}\n    <ZoomControl />\n    <StyledEditorWrapper\n      $widget={isWidget}\n      onContextMenu={e => e.preventDefault()}\n      onClick={blurOnClick}\n      key={String(gesturesEnabled)}\n      $showRulers={rulersEnabled}\n      {...bindLongPress()}\n    >\n      {/* Add your Edit button here */}\n      <div style={{ position: \"absolute\", top: 16, right: 16, zIndex: 10 }}>\n        <button onClick={handleEdit}>Edit JSON</button>\n      </div>\n      <Space\n        onUpdated={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n    </StyledEditorWrapper>\n  </Box>\n);\n// ...existing code...\n````\n\n**Summary:**  \nPlace the button inside `<StyledEditorWrapper>`, but outside `<Space>`, so it overlays the graph UI.  \nYou can adjust the `style` for positioning as needed.",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        }
+      ],
+      "responseId": "response_d0e37130-1876-49d1-9eb5-e3ff3c602604",
+      "result": {
+        "timings": {
+          "firstProgress": 722,
+          "totalElapsed": 3473
+        },
+        "metadata": {
+          "codeBlocks": [
+            {
+              "code": "// ...existing code...\nreturn (\n  <Box pos=\"relative\" h=\"100%\" w=\"100%\">\n    {aboveSupportedLimit && <NotSupported />}\n    <LoadingOverlay visible={debouncedLoading} />\n    {!isWidget && <OptionsMenu />}\n    {!isWidget && <SecureInfo />}\n    <ZoomControl />\n    <StyledEditorWrapper\n      $widget={isWidget}\n      onContextMenu={e => e.preventDefault()}\n      onClick={blurOnClick}\n      key={String(gesturesEnabled)}\n      $showRulers={rulersEnabled}\n      {...bindLongPress()}\n    >\n      {/* Add your Edit button here */}\n      <div style={{ position: \"absolute\", top: 16, right: 16, zIndex: 10 }}>\n        <button onClick={handleEdit}>Edit JSON</button>\n      </div>\n      <Space\n        onUpdated={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n    </StyledEditorWrapper>\n  </Box>\n);\n// ...existing code...\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "You should place the Edit button **inside your main return JSX**, ideally above or below your graph rendering component.  \nIn your case, you can add it **inside the `<StyledEditorWrapper>` but outside the `<Space>`**, so it overlays the graph but is not part of the zoomable/canvas area.\n\nHere’s how you can do it:\n\n"
+            }
+          ],
+          "toolCallRounds": [
+            {
+              "response": "You should place the Edit button **inside your main return JSX**, ideally above or below your graph rendering component.  \nIn your case, you can add it **inside the `<StyledEditorWrapper>` but outside the `<Space>`**, so it overlays the graph but is not part of the zoomable/canvas area.\n\nHere’s how you can do it:\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx\n// ...existing code...\nreturn (\n  <Box pos=\"relative\" h=\"100%\" w=\"100%\">\n    {aboveSupportedLimit && <NotSupported />}\n    <LoadingOverlay visible={debouncedLoading} />\n    {!isWidget && <OptionsMenu />}\n    {!isWidget && <SecureInfo />}\n    <ZoomControl />\n    <StyledEditorWrapper\n      $widget={isWidget}\n      onContextMenu={e => e.preventDefault()}\n      onClick={blurOnClick}\n      key={String(gesturesEnabled)}\n      $showRulers={rulersEnabled}\n      {...bindLongPress()}\n    >\n      {/* Add your Edit button here */}\n      <div style={{ position: \"absolute\", top: 16, right: 16, zIndex: 10 }}>\n        <button onClick={handleEdit}>Edit JSON</button>\n      </div>\n      <Space\n        onUpdated={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n    </StyledEditorWrapper>\n  </Box>\n);\n// ...existing code...\n````\n\n**Summary:**  \nPlace the button inside `<StyledEditorWrapper>`, but outside `<Space>`, so it overlays the graph UI.  \nYou can adjust the `style` for positioning as needed.",
+              "toolCalls": [],
+              "toolInputRetry": 0,
+              "id": "c66816c8-3439-4c11-a54b-fc1311a1ef01"
+            }
+          ],
+          "modelMessageId": "702da76e-7bb2-4cad-9781-1700ff51b2a6",
+          "responseId": "d0a5293d-5943-472e-ae60-3bf4b5a0e991",
+          "sessionId": "17490ed5-404d-4769-bb75-5ee5cc3738f9",
+          "agentId": "github.copilot.default"
+        }
+      },
+      "followups": [],
+      "isCanceled": false,
+      "agent": {
+        "extensionId": {
+          "value": "GitHub.copilot-chat",
+          "_lower": "github.copilot-chat"
+        },
+        "publisherDisplayName": "GitHub",
+        "extensionPublisherId": "GitHub",
+        "extensionDisplayName": "GitHub Copilot Chat",
+        "id": "github.copilot.default",
+        "description": "Ask Copilot",
+        "metadata": {
+          "themeIcon": {
+            "id": "copilot"
+          },
+          "hasFollowups": false,
+          "helpTextPrefix": "You can ask me general programming questions, or chat with the following participants which have specialized expertise and can perform actions:",
+          "helpTextVariablesPrefix": "You can also help me understand your question by using the following variables to give me extra context:",
+          "helpTextPostfix": {
+            "value": "To have a great conversation, ask me questions as if I was a real programmer:\n\n* **Show me the code** you want to talk about by having the files open and selecting the most important lines.\n* **Make refinements** by asking me follow-up questions, adding clarifications, providing errors, etc.\n* **Review my suggested code** and tell me about issues or improvements, so I can iterate on it.\n\nYou can also ask me questions about your editor selection by [starting an inline chat session](command:inlineChat.start).\n\nLearn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted) in [Visual Studio Code](https://code.visualstudio.com/docs/copilot/overview). Or explore the [Copilot walkthrough](command:github.copilot.open.walkthrough).",
+            "isTrusted": {
+              "enabledCommands": [
+                "inlineChat.start",
+                "github.copilot.open.walkthrough"
+              ]
+            },
+            "supportThemeIcons": false,
+            "supportHtml": false,
+            "uris": {
+              "command:inlineChat.start": {
+                "$mid": 1,
+                "path": "inlineChat.start",
+                "scheme": "command"
+              },
+              "https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted": {
+                "$mid": 1,
+                "path": "/copilot/using-github-copilot/getting-started-with-github-copilot",
+                "scheme": "https",
+                "authority": "docs.github.com",
+                "query": "tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted"
+              },
+              "https://code.visualstudio.com/docs/copilot/overview": {
+                "$mid": 1,
+                "path": "/docs/copilot/overview",
+                "scheme": "https",
+                "authority": "code.visualstudio.com"
+              },
+              "command:github.copilot.open.walkthrough": {
+                "$mid": 1,
+                "path": "github.copilot.open.walkthrough",
+                "scheme": "command"
+              }
+            }
+          },
+          "supportIssueReporting": false,
+          "requester": {
+            "name": "noodlebarpip",
+            "icon": {
+              "$mid": 1,
+              "path": "/u/212860591",
+              "scheme": "https",
+              "authority": "avatars.githubusercontent.com",
+              "query": "v=4"
+            }
+          }
+        },
+        "name": "GitHubCopilot",
+        "fullName": "GitHub Copilot",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask"
+        ],
+        "slashCommands": [],
+        "disambiguation": [
+          {
+            "category": "generate_code_sample",
+            "description": "The user wants to generate code snippets without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Write an example of computing a SHA256 hash."
+            ]
+          },
+          {
+            "category": "add_feature_to_file",
+            "description": "The user wants to change code in a file that is provided in their request, without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Add a refresh button to the table widget."
+            ]
+          },
+          {
+            "category": "question_about_specific_files",
+            "description": "The user has a question about a specific file or code snippet that they have provided as part of their query, and the question does not require additional workspace context to answer.",
+            "examples": [
+              "What does this file do?"
+            ]
+          }
+        ]
+      },
+      "contentReferences": [
+        {
+          "kind": "reference",
+          "reference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        }
+      ],
+      "codeCitations": [
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={()"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() =>"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => deb"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debounced"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOn"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoom"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChange"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        on"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={set"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setView"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        on"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContext"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e =>"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.prevent"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treat"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwo"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFinger"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrack"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPad"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGest"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGestures"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLike"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gest"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gestures"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        poll"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollFor"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElement"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementRes"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        class"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\""
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"json"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncr"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <Graph"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas is"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={is"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget}"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n   "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/containers/Views/GraphView/index.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "={() => debouncedOnZoomChangeHandler()}\n        onCreate={setViewPort}\n        onContextMenu={e => e.preventDefault()}\n        treatTwoFingerTrackPadGesturesLikeTouch={gesturesEnabled}\n        pollForElementResizing\n        className=\"jsoncrack-space\"\n      >\n        <GraphCanvas isWidget={isWidget} />\n      </Space>\n    <"
+        }
+      ],
+      "timestamp": 1753206307904,
+      "modelId": "github.copilot-chat/gpt-4.1"
+    },
+    {
+      "requestId": "request_c703090e-b441-4cb3-ab33-c5def2b00249",
+      "message": {
+        "parts": [
+          {
+            "range": {
+              "start": 0,
+              "endExclusive": 50
+            },
+            "editorRange": {
+              "startLineNumber": 1,
+              "startColumn": 1,
+              "endLineNumber": 1,
+              "endColumn": 51
+            },
+            "text": "I need the edit button to be at each terminal node",
+            "kind": "text"
+          }
+        ],
+        "text": "I need the edit button to be at each terminal node"
+      },
+      "variableData": {
+        "variables": [
+          {
+            "kind": "file",
+            "id": "vscode.implicit.viewport",
+            "name": "file:index.tsx",
+            "value": {
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "range": {
+                "startLineNumber": 180,
+                "startColumn": 1,
+                "endLineNumber": 203,
+                "endColumn": 33
+              }
+            },
+            "modelDescription": "User's current visible code"
+          }
+        ]
+      },
+      "response": [
+        {
+          "value": "To add an **Edit JSON** button to each terminal node (a node with no outgoing edges), you need to:\n\n1. **Identify terminal nodes** in your graph data.\n2. **Render a button inside each terminal node** (in your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "1bd24581-fd2b-49b5-955c-ca80e8efff14"
+        },
+        {
+          "value": " component).\n3. **Handle the edit action** for the specific node.\n\nBelow is a step-by-step guide:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "GraphCanvas",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 81,
+                "startColumn": 7,
+                "endLineNumber": 81,
+                "endColumn": 7
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "246fc23b-d460-47c2-a90a-c55c97fdb311"
+        },
+        {
+          "value": " to determine which nodes are terminal and pass that info to ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "c34a19d5-8c9c-4ff1-b478-fc9e54de14a6"
+        },
+        {
+          "value": ".\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n  // ...existing code...\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n````\n\n---\n\n### 2. Add Edit Button to CustomNode\n\nUpdate your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "5d4b75c4-275c-461a-846a-446337593498"
+        },
+        {
+          "value": " component to show the Edit button if `isTerminal` is true.\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "import React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(props.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...existing node rendering... */}\n      {isTerminal && (\n        <foreignObject x={10} y={-10} width={80} height={30}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n            }}\n            onClick={e => {\n              e.stopPropagation();\n              handleEdit();\n            }}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n````\n\n---\n\n### 3. Remove the Global Edit Button\n\nYou can now remove the global Edit button from your main view.\n\n---\n\n**Summary:**  \n- Compute terminal nodes in ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "GraphCanvas",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 81,
+                "startColumn": 7,
+                "endLineNumber": 81,
+                "endColumn": 7
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "d4a8edc2-3768-4f0b-88bd-df0d5a79a479"
+        },
+        {
+          "value": ".\n- Pass `isTerminal` to ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "3b105b26-dd8a-4b91-9b0a-582141eba8c7"
+        },
+        {
+          "value": ".\n- Render an Edit button in each terminal node.\n\nLet me know if you want the edit to only affect the node's data, or the whole JSON!",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        }
+      ],
+      "responseId": "response_2879358f-ac0c-4893-9b8e-c28217666ad8",
+      "result": {
+        "timings": {
+          "firstProgress": 873,
+          "totalElapsed": 6853
+        },
+        "metadata": {
+          "codeBlocks": [
+            {
+              "code": "// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n  // ...existing code...\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "To add an **Edit JSON** button to each terminal node (a node with no outgoing edges), you need to:\n\n1. **Identify terminal nodes** in your graph data.\n2. **Render a button inside each terminal node** (in your  component).\n3. **Handle the edit action** for the specific node.\n\nBelow is a step-by-step guide:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your  to determine which nodes are terminal and pass that info to .\n\n"
+            },
+            {
+              "code": "import React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(props.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...existing node rendering... */}\n      {isTerminal && (\n        <foreignObject x={10} y={-10} width={80} height={30}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n            }}\n            onClick={e => {\n              e.stopPropagation();\n              handleEdit();\n            }}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "\n---\n\n### 2. Add Edit Button to CustomNode\n\nUpdate your  component to show the Edit button if `isTerminal` is true.\n\n"
+            }
+          ],
+          "toolCallRounds": [
+            {
+              "response": "To add an **Edit JSON** button to each terminal node (a node with no outgoing edges), you need to:\n\n1. **Identify terminal nodes** in your graph data.\n2. **Render a button inside each terminal node** (in your `CustomNode` component).\n3. **Handle the edit action** for the specific node.\n\nBelow is a step-by-step guide:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your `GraphCanvas` to determine which nodes are terminal and pass that info to `CustomNode`.\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx\n// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n  // ...existing code...\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n````\n\n---\n\n### 2. Add Edit Button to CustomNode\n\nUpdate your `CustomNode` component to show the Edit button if `isTerminal` is true.\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx\nimport React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = () => {\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(props.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...existing node rendering... */}\n      {isTerminal && (\n        <foreignObject x={10} y={-10} width={80} height={30}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n            }}\n            onClick={e => {\n              e.stopPropagation();\n              handleEdit();\n            }}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n````\n\n---\n\n### 3. Remove the Global Edit Button\n\nYou can now remove the global Edit button from your main view.\n\n---\n\n**Summary:**  \n- Compute terminal nodes in `GraphCanvas`.\n- Pass `isTerminal` to `CustomNode`.\n- Render an Edit button in each terminal node.\n\nLet me know if you want the edit to only affect the node's data, or the whole JSON!",
+              "toolCalls": [],
+              "toolInputRetry": 0,
+              "id": "a0e148eb-1af3-4efd-b4bc-4e873d2ff652"
+            }
+          ],
+          "modelMessageId": "ff2e0669-7dbf-47a8-b612-42d9e8b9b56c",
+          "responseId": "57687853-be94-4efb-b0ca-e9d3dafd4975",
+          "sessionId": "17490ed5-404d-4769-bb75-5ee5cc3738f9",
+          "agentId": "github.copilot.default"
+        }
+      },
+      "followups": [],
+      "isCanceled": false,
+      "agent": {
+        "extensionId": {
+          "value": "GitHub.copilot-chat",
+          "_lower": "github.copilot-chat"
+        },
+        "publisherDisplayName": "GitHub",
+        "extensionPublisherId": "GitHub",
+        "extensionDisplayName": "GitHub Copilot Chat",
+        "id": "github.copilot.default",
+        "description": "Ask Copilot",
+        "metadata": {
+          "themeIcon": {
+            "id": "copilot"
+          },
+          "hasFollowups": false,
+          "helpTextPrefix": "You can ask me general programming questions, or chat with the following participants which have specialized expertise and can perform actions:",
+          "helpTextVariablesPrefix": "You can also help me understand your question by using the following variables to give me extra context:",
+          "helpTextPostfix": {
+            "value": "To have a great conversation, ask me questions as if I was a real programmer:\n\n* **Show me the code** you want to talk about by having the files open and selecting the most important lines.\n* **Make refinements** by asking me follow-up questions, adding clarifications, providing errors, etc.\n* **Review my suggested code** and tell me about issues or improvements, so I can iterate on it.\n\nYou can also ask me questions about your editor selection by [starting an inline chat session](command:inlineChat.start).\n\nLearn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted) in [Visual Studio Code](https://code.visualstudio.com/docs/copilot/overview). Or explore the [Copilot walkthrough](command:github.copilot.open.walkthrough).",
+            "isTrusted": {
+              "enabledCommands": [
+                "inlineChat.start",
+                "github.copilot.open.walkthrough"
+              ]
+            },
+            "supportThemeIcons": false,
+            "supportHtml": false,
+            "uris": {
+              "command:inlineChat.start": {
+                "$mid": 1,
+                "path": "inlineChat.start",
+                "scheme": "command"
+              },
+              "https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted": {
+                "$mid": 1,
+                "path": "/copilot/using-github-copilot/getting-started-with-github-copilot",
+                "scheme": "https",
+                "authority": "docs.github.com",
+                "query": "tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted"
+              },
+              "https://code.visualstudio.com/docs/copilot/overview": {
+                "$mid": 1,
+                "path": "/docs/copilot/overview",
+                "scheme": "https",
+                "authority": "code.visualstudio.com"
+              },
+              "command:github.copilot.open.walkthrough": {
+                "$mid": 1,
+                "path": "github.copilot.open.walkthrough",
+                "scheme": "command"
+              }
+            }
+          },
+          "supportIssueReporting": false,
+          "requester": {
+            "name": "noodlebarpip",
+            "icon": {
+              "$mid": 1,
+              "path": "/u/212860591",
+              "scheme": "https",
+              "authority": "avatars.githubusercontent.com",
+              "query": "v=4"
+            }
+          }
+        },
+        "name": "GitHubCopilot",
+        "fullName": "GitHub Copilot",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask"
+        ],
+        "slashCommands": [],
+        "disambiguation": [
+          {
+            "category": "generate_code_sample",
+            "description": "The user wants to generate code snippets without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Write an example of computing a SHA256 hash."
+            ]
+          },
+          {
+            "category": "add_feature_to_file",
+            "description": "The user wants to change code in a file that is provided in their request, without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Add a refresh button to the table widget."
+            ]
+          },
+          {
+            "category": "question_about_specific_files",
+            "description": "The user has a question about a specific file or code snippet that they have provided as part of their query, and the question does not require additional workspace context to answer.",
+            "examples": [
+              "What does this file do?"
+            ]
+          }
+        ]
+      },
+      "contentReferences": [
+        {
+          "kind": "reference",
+          "reference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        }
+      ],
+      "codeCitations": [],
+      "timestamp": 1753206383339,
+      "modelId": "github.copilot-chat/gpt-4.1"
+    },
+    {
+      "requestId": "request_c2a70cb7-aab9-4c83-ac11-93d57f6292a2",
+      "message": {
+        "parts": [
+          {
+            "range": {
+              "start": 0,
+              "endExclusive": 48
+            },
+            "editorRange": {
+              "startLineNumber": 1,
+              "startColumn": 1,
+              "endLineNumber": 1,
+              "endColumn": 49
+            },
+            "text": "I need the edit button to be at node content box",
+            "kind": "text"
+          }
+        ],
+        "text": "I need the edit button to be at node content box"
+      },
+      "variableData": {
+        "variables": [
+          {
+            "kind": "file",
+            "id": "vscode.implicit.viewport",
+            "name": "file:index.tsx",
+            "value": {
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "range": {
+                "startLineNumber": 89,
+                "startColumn": 1,
+                "endLineNumber": 112,
+                "endColumn": 1
+              }
+            },
+            "modelDescription": "User's current visible code"
+          }
+        ]
+      },
+      "response": [
+        {
+          "value": "To place the **Edit JSON** button inside each node's content box (not floating above the canvas), you should update your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "f213cd6c-2577-4fd3-a732-6ed41816567a"
+        },
+        {
+          "value": " component.  \nYou also need to determine if the node is a terminal node (no outgoing edges) and only show the button for those nodes if desired.\n\nHere’s how you can do it:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "GraphCanvas",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 81,
+                "startColumn": 7,
+                "endLineNumber": 81,
+                "endColumn": 7
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "0548326e-8955-477f-b6b2-b2476d4a5f02"
+        },
+        {
+          "value": " to compute which nodes are terminal and pass that info to ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "b14820ab-9dc6-4203-8ea7-e28eba479da0"
+        },
+        {
+          "value": ":\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n````\n\n---\n\n### 2. Update CustomNode to Render the Edit Button\n\nEdit your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "CustomNode.tsx",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 70,
+                "startColumn": 14,
+                "endLineNumber": 70,
+                "endColumn": 14
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/index.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "5999280e-9dbf-4e3b-81b2-c47fd4a313ee"
+        },
+        {
+          "value": " to render the button inside the node box.  \nYou can use a `<foreignObject>` to render HTML inside SVG nodes.\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "import React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, data, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...your existing node rendering... */}\n      <rect width={120} height={40} fill=\"#fff\" stroke=\"#333\" rx={8} />\n      <text x={60} y={20} textAnchor=\"middle\" alignmentBaseline=\"middle\" fontSize={14}>\n        {data?.label || id}\n      </text>\n      {isTerminal && (\n        <foreignObject x={30} y={25} width={60} height={20}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n              width: \"100%\",\n            }}\n            onClick={handleEdit}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n````\n\n---\n\n### 3. Remove the Global Edit Button\n\nYou can now remove the global Edit button from your main view.\n\n---\n\n**Result:**  \nThe **Edit JSON** button will now appear inside each node's content box (for terminal nodes only, or for all nodes if you remove the `isTerminal` check).\n\nLet me know if you want the button for all nodes, or only for terminal nodes!",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        }
+      ],
+      "responseId": "response_7d74999b-469d-44c6-9420-413de7454534",
+      "result": {
+        "timings": {
+          "firstProgress": 1345,
+          "totalElapsed": 6313
+        },
+        "metadata": {
+          "codeBlocks": [
+            {
+              "code": "// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "To place the **Edit JSON** button inside each node's content box (not floating above the canvas), you should update your  component.  \nYou also need to determine if the node is a terminal node (no outgoing edges) and only show the button for those nodes if desired.\n\nHere’s how you can do it:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your  to compute which nodes are terminal and pass that info to :\n\n"
+            },
+            {
+              "code": "import React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, data, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...your existing node rendering... */}\n      <rect width={120} height={40} fill=\"#fff\" stroke=\"#333\" rx={8} />\n      <text x={60} y={20} textAnchor=\"middle\" alignmentBaseline=\"middle\" fontSize={14}>\n        {data?.label || id}\n      </text>\n      {isTerminal && (\n        <foreignObject x={30} y={25} width={60} height={20}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n              width: \"100%\",\n            }}\n            onClick={handleEdit}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "\n---\n\n### 2. Update CustomNode to Render the Edit Button\n\nEdit your  to render the button inside the node box.  \nYou can use a `<foreignObject>` to render HTML inside SVG nodes.\n\n"
+            }
+          ],
+          "toolCallRounds": [
+            {
+              "response": "To place the **Edit JSON** button inside each node's content box (not floating above the canvas), you should update your `CustomNode` component.  \nYou also need to determine if the node is a terminal node (no outgoing edges) and only show the button for those nodes if desired.\n\nHere’s how you can do it:\n\n---\n\n### 1. Pass Terminal Node Info to CustomNode\n\nUpdate your `GraphCanvas` to compute which nodes are terminal and pass that info to `CustomNode`:\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx\n// ...existing code...\nconst GraphCanvas = ({ isWidget }: GraphProps) => {\n  // ...existing code...\n  const nodes = useGraph(state => state.nodes);\n  const edges = useGraph(state => state.edges);\n\n  // Find terminal node IDs (no outgoing edges)\n  const terminalNodeIds = React.useMemo(() => {\n    const fromIds = new Set(edges.map(e => e.from));\n    return nodes.filter(n => !fromIds.has(n.id)).map(n => n.id);\n  }, [nodes, edges]);\n\n  return (\n    <Canvas\n      // ...existing props...\n      node={p => (\n        <CustomNode\n          {...p}\n          isTerminal={terminalNodeIds.includes(p.id)}\n        />\n      )}\n      // ...existing props...\n    />\n  );\n};\n````\n\n---\n\n### 2. Update CustomNode to Render the Edit Button\n\nEdit your `CustomNode.tsx` to render the button inside the node box.  \nYou can use a `<foreignObject>` to render HTML inside SVG nodes.\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode.tsx\nimport React from \"react\";\nimport useGraph from \"./stores/useGraph\";\n\nexport const CustomNode = (props: any) => {\n  const { isTerminal, id, data, ...rest } = props;\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <g {...rest}>\n      {/* ...your existing node rendering... */}\n      <rect width={120} height={40} fill=\"#fff\" stroke=\"#333\" rx={8} />\n      <text x={60} y={20} textAnchor=\"middle\" alignmentBaseline=\"middle\" fontSize={14}>\n        {data?.label || id}\n      </text>\n      {isTerminal && (\n        <foreignObject x={30} y={25} width={60} height={20}>\n          <button\n            style={{\n              fontSize: \"10px\",\n              padding: \"2px 6px\",\n              borderRadius: \"4px\",\n              cursor: \"pointer\",\n              width: \"100%\",\n            }}\n            onClick={handleEdit}\n          >\n            Edit JSON\n          </button>\n        </foreignObject>\n      )}\n    </g>\n  );\n};\n````\n\n---\n\n### 3. Remove the Global Edit Button\n\nYou can now remove the global Edit button from your main view.\n\n---\n\n**Result:**  \nThe **Edit JSON** button will now appear inside each node's content box (for terminal nodes only, or for all nodes if you remove the `isTerminal` check).\n\nLet me know if you want the button for all nodes, or only for terminal nodes!",
+              "toolCalls": [],
+              "toolInputRetry": 0,
+              "id": "c9407346-cdcd-4af7-9ba1-a28d41d46d06"
+            }
+          ],
+          "modelMessageId": "0550fb42-8469-4196-bff0-d525c86d49c2",
+          "responseId": "a0a43566-6772-4f3e-b8ad-725e99afc3f8",
+          "sessionId": "17490ed5-404d-4769-bb75-5ee5cc3738f9",
+          "agentId": "github.copilot.default"
+        }
+      },
+      "followups": [],
+      "isCanceled": false,
+      "agent": {
+        "extensionId": {
+          "value": "GitHub.copilot-chat",
+          "_lower": "github.copilot-chat"
+        },
+        "publisherDisplayName": "GitHub",
+        "extensionPublisherId": "GitHub",
+        "extensionDisplayName": "GitHub Copilot Chat",
+        "id": "github.copilot.default",
+        "description": "Ask Copilot",
+        "metadata": {
+          "themeIcon": {
+            "id": "copilot"
+          },
+          "hasFollowups": false,
+          "helpTextPrefix": "You can ask me general programming questions, or chat with the following participants which have specialized expertise and can perform actions:",
+          "helpTextVariablesPrefix": "You can also help me understand your question by using the following variables to give me extra context:",
+          "helpTextPostfix": {
+            "value": "To have a great conversation, ask me questions as if I was a real programmer:\n\n* **Show me the code** you want to talk about by having the files open and selecting the most important lines.\n* **Make refinements** by asking me follow-up questions, adding clarifications, providing errors, etc.\n* **Review my suggested code** and tell me about issues or improvements, so I can iterate on it.\n\nYou can also ask me questions about your editor selection by [starting an inline chat session](command:inlineChat.start).\n\nLearn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted) in [Visual Studio Code](https://code.visualstudio.com/docs/copilot/overview). Or explore the [Copilot walkthrough](command:github.copilot.open.walkthrough).",
+            "isTrusted": {
+              "enabledCommands": [
+                "inlineChat.start",
+                "github.copilot.open.walkthrough"
+              ]
+            },
+            "supportThemeIcons": false,
+            "supportHtml": false,
+            "uris": {
+              "command:inlineChat.start": {
+                "$mid": 1,
+                "path": "inlineChat.start",
+                "scheme": "command"
+              },
+              "https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted": {
+                "$mid": 1,
+                "path": "/copilot/using-github-copilot/getting-started-with-github-copilot",
+                "scheme": "https",
+                "authority": "docs.github.com",
+                "query": "tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted"
+              },
+              "https://code.visualstudio.com/docs/copilot/overview": {
+                "$mid": 1,
+                "path": "/docs/copilot/overview",
+                "scheme": "https",
+                "authority": "code.visualstudio.com"
+              },
+              "command:github.copilot.open.walkthrough": {
+                "$mid": 1,
+                "path": "github.copilot.open.walkthrough",
+                "scheme": "command"
+              }
+            }
+          },
+          "supportIssueReporting": false,
+          "requester": {
+            "name": "noodlebarpip",
+            "icon": {
+              "$mid": 1,
+              "path": "/u/212860591",
+              "scheme": "https",
+              "authority": "avatars.githubusercontent.com",
+              "query": "v=4"
+            }
+          }
+        },
+        "name": "GitHubCopilot",
+        "fullName": "GitHub Copilot",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask"
+        ],
+        "slashCommands": [],
+        "disambiguation": [
+          {
+            "category": "generate_code_sample",
+            "description": "The user wants to generate code snippets without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Write an example of computing a SHA256 hash."
+            ]
+          },
+          {
+            "category": "add_feature_to_file",
+            "description": "The user wants to change code in a file that is provided in their request, without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Add a refresh button to the table widget."
+            ]
+          },
+          {
+            "category": "question_about_specific_files",
+            "description": "The user has a question about a specific file or code snippet that they have provided as part of their query, and the question does not require additional workspace context to answer.",
+            "examples": [
+              "What does this file do?"
+            ]
+          }
+        ]
+      },
+      "contentReferences": [
+        {
+          "kind": "reference",
+          "reference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/index.tsx",
+            "scheme": "file"
+          }
+        }
+      ],
+      "codeCitations": [],
+      "timestamp": 1753206457874,
+      "modelId": "github.copilot-chat/gpt-4.1"
+    },
+    {
+      "requestId": "request_791c894d-e692-4b19-9009-3b7b0a84a5a2",
+      "message": {
+        "parts": [
+          {
+            "range": {
+              "start": 0,
+              "endExclusive": 48
+            },
+            "editorRange": {
+              "startLineNumber": 1,
+              "startColumn": 1,
+              "endLineNumber": 1,
+              "endColumn": 49
+            },
+            "text": "I need the edit button to be at node content box",
+            "kind": "text"
+          }
+        ],
+        "text": "I need the edit button to be at node content box"
+      },
+      "variableData": {
+        "variables": [
+          {
+            "kind": "file",
+            "id": "vscode.implicit.viewport",
+            "name": "file:ObjectNode.tsx",
+            "value": {
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+                "scheme": "file"
+              },
+              "range": {
+                "startLineNumber": 1,
+                "startColumn": 1,
+                "endLineNumber": 24,
+                "endColumn": 92
+              }
+            },
+            "modelDescription": "User's current visible code"
+          }
+        ]
+      },
+      "response": [
+        {
+          "value": "To add the **Edit JSON** button inside the node content box for each node, you should place the button inside your ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "name": "Styled.StyledForeignObject",
+            "kind": 12,
+            "containerName": "",
+            "location": {
+              "range": {
+                "startLineNumber": 1,
+                "startColumn": 1,
+                "endLineNumber": 1,
+                "endColumn": 1
+              },
+              "uri": {
+                "$mid": 1,
+                "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/styles.tsx",
+                "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/styles.tsx",
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/styles.tsx",
+                "scheme": "file"
+              }
+            }
+          },
+          "resolveId": "f2758350-4852-4dd0-8482-77dbf2d192ad"
+        },
+        {
+          "value": " in ",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "inlineReference",
+          "inlineReference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": ".  \nYou likely want to show it at the bottom or top of the node box.\n\nHere’s how you can do it:\n\n````tsx\n",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        },
+        {
+          "kind": "codeblockUri",
+          "uri": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "scheme": "file"
+          }
+        },
+        {
+          "value": "import useGraph from \"../stores/useGraph\"; // Add this import\n\n// ...existing code...\n\nconst Node = ({ node, x, y }: CustomNodeProps) => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(node.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <Styled.StyledForeignObject\n      data-id={`node-${node.id}`}\n      width={node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key={idx} />\n      ))}\n      <div style={{ marginTop: 4, textAlign: \"right\" }}>\n        <button\n          style={{\n            fontSize: \"10px\",\n            padding: \"2px 6px\",\n            borderRadius: \"4px\",\n            cursor: \"pointer\",\n          }}\n          onClick={handleEdit}\n        >\n          Edit JSON\n        </button>\n      </div>\n    </Styled.StyledForeignObject>\n  );\n};\n````\n\n**Now, every node will have an Edit JSON button inside its content box.**  \nYou can further style or position the button as needed!",
+          "supportThemeIcons": false,
+          "supportHtml": false,
+          "baseUri": {
+            "$mid": 1,
+            "path": "/Users/mpai/jsoncrack.com/",
+            "scheme": "file"
+          }
+        }
+      ],
+      "responseId": "response_f7fd72c1-f7c0-487f-a01b-1ac5241f5eb5",
+      "result": {
+        "timings": {
+          "firstProgress": 1375,
+          "totalElapsed": 4333
+        },
+        "metadata": {
+          "codeBlocks": [
+            {
+              "code": "import useGraph from \"../stores/useGraph\"; // Add this import\n\n// ...existing code...\n\nconst Node = ({ node, x, y }: CustomNodeProps) => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(node.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <Styled.StyledForeignObject\n      data-id={`node-${node.id}`}\n      width={node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key={idx} />\n      ))}\n      <div style={{ marginTop: 4, textAlign: \"right\" }}>\n        <button\n          style={{\n            fontSize: \"10px\",\n            padding: \"2px 6px\",\n            borderRadius: \"4px\",\n            cursor: \"pointer\",\n          }}\n          onClick={handleEdit}\n        >\n          Edit JSON\n        </button>\n      </div>\n    </Styled.StyledForeignObject>\n  );\n};\n",
+              "resource": {
+                "$mid": 1,
+                "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+                "scheme": "file"
+              },
+              "language": "tsx",
+              "markdownBeforeBlock": "To add the **Edit JSON** button inside the node content box for each node, you should place the button inside your  in .  \nYou likely want to show it at the bottom or top of the node box.\n\nHere’s how you can do it:\n\n"
+            }
+          ],
+          "toolCallRounds": [
+            {
+              "response": "To add the **Edit JSON** button inside the node content box for each node, you should place the button inside your `Styled.StyledForeignObject` in `ObjectNode.tsx`.  \nYou likely want to show it at the bottom or top of the node box.\n\nHere’s how you can do it:\n\n````tsx\n// filepath: /Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx\nimport useGraph from \"../stores/useGraph\"; // Add this import\n\n// ...existing code...\n\nconst Node = ({ node, x, y }: CustomNodeProps) => {\n  const editJson = useGraph(state => state.editJson);\n\n  const handleEdit = (e: React.MouseEvent) => {\n    e.stopPropagation();\n    const newJson = window.prompt(\"Edit JSON for this node:\", JSON.stringify(node.data, null, 2));\n    if (newJson) {\n      editJson(newJson);\n    }\n  };\n\n  return (\n    <Styled.StyledForeignObject\n      data-id={`node-${node.id}`}\n      width={node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key={idx} />\n      ))}\n      <div style={{ marginTop: 4, textAlign: \"right\" }}>\n        <button\n          style={{\n            fontSize: \"10px\",\n            padding: \"2px 6px\",\n            borderRadius: \"4px\",\n            cursor: \"pointer\",\n          }}\n          onClick={handleEdit}\n        >\n          Edit JSON\n        </button>\n      </div>\n    </Styled.StyledForeignObject>\n  );\n};\n````\n\n**Now, every node will have an Edit JSON button inside its content box.**  \nYou can further style or position the button as needed!",
+              "toolCalls": [],
+              "toolInputRetry": 0,
+              "id": "bf0cc9db-5be9-4eb1-8b37-90b120e4b25c"
+            }
+          ],
+          "modelMessageId": "077b24b5-03d4-4987-98bf-673d7b41677a",
+          "responseId": "3e65cd71-f18d-4885-93ee-e7dc91161806",
+          "sessionId": "17490ed5-404d-4769-bb75-5ee5cc3738f9",
+          "agentId": "github.copilot.default"
+        }
+      },
+      "followups": [],
+      "isCanceled": false,
+      "agent": {
+        "extensionId": {
+          "value": "GitHub.copilot-chat",
+          "_lower": "github.copilot-chat"
+        },
+        "publisherDisplayName": "GitHub",
+        "extensionPublisherId": "GitHub",
+        "extensionDisplayName": "GitHub Copilot Chat",
+        "id": "github.copilot.default",
+        "description": "Ask Copilot",
+        "metadata": {
+          "themeIcon": {
+            "id": "copilot"
+          },
+          "hasFollowups": false,
+          "helpTextPrefix": "You can ask me general programming questions, or chat with the following participants which have specialized expertise and can perform actions:",
+          "helpTextVariablesPrefix": "You can also help me understand your question by using the following variables to give me extra context:",
+          "helpTextPostfix": {
+            "value": "To have a great conversation, ask me questions as if I was a real programmer:\n\n* **Show me the code** you want to talk about by having the files open and selecting the most important lines.\n* **Make refinements** by asking me follow-up questions, adding clarifications, providing errors, etc.\n* **Review my suggested code** and tell me about issues or improvements, so I can iterate on it.\n\nYou can also ask me questions about your editor selection by [starting an inline chat session](command:inlineChat.start).\n\nLearn more about [GitHub Copilot](https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted) in [Visual Studio Code](https://code.visualstudio.com/docs/copilot/overview). Or explore the [Copilot walkthrough](command:github.copilot.open.walkthrough).",
+            "isTrusted": {
+              "enabledCommands": [
+                "inlineChat.start",
+                "github.copilot.open.walkthrough"
+              ]
+            },
+            "supportThemeIcons": false,
+            "supportHtml": false,
+            "uris": {
+              "command:inlineChat.start": {
+                "$mid": 1,
+                "path": "inlineChat.start",
+                "scheme": "command"
+              },
+              "https://docs.github.com/copilot/using-github-copilot/getting-started-with-github-copilot?tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted": {
+                "$mid": 1,
+                "path": "/copilot/using-github-copilot/getting-started-with-github-copilot",
+                "scheme": "https",
+                "authority": "docs.github.com",
+                "query": "tool=vscode&utm_source=editor&utm_medium=chat-panel&utm_campaign=2024q3-em-MSFT-getstarted"
+              },
+              "https://code.visualstudio.com/docs/copilot/overview": {
+                "$mid": 1,
+                "path": "/docs/copilot/overview",
+                "scheme": "https",
+                "authority": "code.visualstudio.com"
+              },
+              "command:github.copilot.open.walkthrough": {
+                "$mid": 1,
+                "path": "github.copilot.open.walkthrough",
+                "scheme": "command"
+              }
+            }
+          },
+          "supportIssueReporting": false,
+          "requester": {
+            "name": "noodlebarpip",
+            "icon": {
+              "$mid": 1,
+              "path": "/u/212860591",
+              "scheme": "https",
+              "authority": "avatars.githubusercontent.com",
+              "query": "v=4"
+            }
+          }
+        },
+        "name": "GitHubCopilot",
+        "fullName": "GitHub Copilot",
+        "isDefault": true,
+        "locations": [
+          "panel"
+        ],
+        "modes": [
+          "ask"
+        ],
+        "slashCommands": [],
+        "disambiguation": [
+          {
+            "category": "generate_code_sample",
+            "description": "The user wants to generate code snippets without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Write an example of computing a SHA256 hash."
+            ]
+          },
+          {
+            "category": "add_feature_to_file",
+            "description": "The user wants to change code in a file that is provided in their request, without referencing the contents of the current workspace. This category does not include generating entire projects.",
+            "examples": [
+              "Add a refresh button to the table widget."
+            ]
+          },
+          {
+            "category": "question_about_specific_files",
+            "description": "The user has a question about a specific file or code snippet that they have provided as part of their query, and the question does not require additional workspace context to answer.",
+            "examples": [
+              "What does this file do?"
+            ]
+          }
+        ]
+      },
+      "contentReferences": [
+        {
+          "kind": "reference",
+          "reference": {
+            "$mid": 1,
+            "fsPath": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "external": "file:///Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "path": "/Users/mpai/jsoncrack.com/src/features/editor/views/GraphView/CustomNode/ObjectNode.tsx",
+            "scheme": "file"
+          }
+        }
+      ],
+      "codeCitations": [
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $is"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n   "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n     "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {("
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[])."
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map(("
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val,"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx)"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) =>"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n       "
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val}"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx}"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x}"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y}"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key={"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/blob/f7e2535a57cc2511e937a16e69639eed6cd405b9/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL-3.0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={idx} x={x} y={y} key={idx"
+        },
+        {
+          "kind": "codeCitation",
+          "value": {
+            "$mid": 1,
+            "path": "/AykutSarac/jsoncrack.com/tree/9af53e5571545916ab4d311c26305cfb08cde768/src/components/Graph/CustomNode/ObjectNode.tsx",
+            "scheme": "https",
+            "authority": "github.com"
+          },
+          "license": "GPL_3_0",
+          "snippet": "node.width}\n      height={node.height}\n      x={0}\n      y={0}\n      $isObject\n    >\n      {(node.text as Value[]).map((val, idx) => (\n        <Row val={val} index={"
+        }
+      ],
+      "timestamp": 1753206589971,
+      "modelId": "github.copilot-chat/gpt-4.1"
+    }
+  ]
+}

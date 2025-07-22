@@ -3,6 +3,7 @@ import type { CustomNodeProps } from ".";
 import { NODE_DIMENSIONS } from "../../../../../constants/graph";
 import { TextRenderer } from "./TextRenderer";
 import * as Styled from "./styles";
+import useGraph from "../stores/useGraph"; 
 
 type Value = [string, string];
 
