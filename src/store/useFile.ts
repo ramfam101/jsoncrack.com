@@ -1,6 +1,7 @@
 import debounce from "lodash.debounce";
 import { event as gaEvent } from "nextjs-google-analytics";
 import { toast } from "react-hot-toast";
+import * as XLSX from "xlsx";
 import { create } from "zustand";
 import { FileFormat } from "../enums/file.enum";
 import useGraph from "../features/editor/views/GraphView/stores/useGraph";
@@ -14,18 +15,18 @@ const defaultJson = JSON.stringify(
     fruit: {
       name: "Apple",
       color: "Red",
-      weight: "150g"
+      weight: "150g",
     },
     car: {
       model: "Model S",
       year: 2022,
-      brand: "Tesla"
+      brand: "Tesla",
     },
     person: {
       name: "Alice",
       occupation: "Engineer",
-      age: 30
-    }
+      age: 30,
+    },
   },
   null,
   2
@@ -120,30 +121,24 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
   },
   setContents: async ({ contents, hasChanges = true, skipUpdate = false, format }) => {
     try {
-      set({
-        ...(contents && { contents }),
-        error: null,
-        hasChanges,
-        format: format ?? get().format,
-      });
-
-      const isFetchURL = window.location.href.includes("?");
-      const json = await contentToJson(get().contents, get().format);
-
-      if (!useConfig.getState().liveTransformEnabled && skipUpdate) return;
-
-      if (get().hasChanges && contents && contents.length < 80_000 && !isIframe() && !isFetchURL) {
-        sessionStorage.setItem("content", contents);
-        sessionStorage.setItem("format", get().format);
-        set({ hasChanges: true });
+      if (format === FileFormat.XLSX) {
+        const workbook = XLSX.read(contents, { type: "binary" });
+        const csvData = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
+        const json = await contentToJson(csvData, FileFormat.CSV);
+        set({ contents: JSON.stringify(json, null, 2), format: FileFormat.JSON, hasChanges });
+      } else {
+        set({
+          ...(contents && { contents }),
+          error: null,
+          hasChanges,
+        });
       }
-
-      debouncedUpdateJson(json);
-    } catch (error: any) {
-      if (error?.mark?.snippet) return set({ error: error.mark.snippet });
-      if (error?.message) set({ error: error.message });
-      useJson.setState({ loading: false });
-      useGraph.setState({ loading: false });
+    } catch (error) {
+      if (error instanceof Error) {
+        set({ error: error.message });
+      } else {
+        set({ error: "An unknown error occurred" });
+      }
     }
   },
   setError: error => set({ error }),
