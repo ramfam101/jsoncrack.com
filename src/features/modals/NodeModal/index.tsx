@@ -1,151 +1,101 @@
-import React, { useState, useEffect } from "react";
-import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
+import React, { useEffect, useState } from "react";
+import { Modal, Stack, Text, ScrollArea, Button, Textarea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
+import type { ModalProps } from "@mantine/core";
+
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
-import useJson from "../../../store/useJson";
 import useFile from "../../../store/useFile";
 
-const dataToString = (data: any) => {
-    return JSON.stringify(data, null, 2);
-};
-
+function serializeContent(content: any): string {
+  const source = Array.isArray(content) ? Object.fromEntries(content) : content;
+  return JSON.stringify(source, null, 2);
+}
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const rawData = useGraph(state => state.selectedNode?.text);
-  const nodeData = dataToString(rawData);
-  const path = useGraph(state => state.selectedNode?.path || "");
+  const node = useGraph(state => state.selectedNode);
+  const updateNode = useGraph(state => state.updateNode);
+  const setNode = useGraph(state => state.setSelectedNode);
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(nodeData);
+  const jsonText = useFile(state => state.contents);
+  const updateJsonText = useFile(state => state.setContents);
+
+  const path = node?.path || "";
+  const defaultText = serializeContent(node?.text ?? {});
+  const [editMode, setEditMode] = useState(false);
+  const [input, setInput] = useState(defaultText);
 
   useEffect(() => {
-    setEditValue(nodeData);
-  }, [nodeData]);
+    setInput(defaultText);
+    setEditMode(false);
+  }, [defaultText, opened]);
 
-    const handleSave = () => {
-        try {
-            console.log("editValue raw:", editValue);
-            const parsed = JSON.parse(editValue);
-            console.log("Parsed JSON:", parsed);
+  const updateJsonByPath = (obj: any, pathStr: string, value: any) => {
+    const keys = pathStr.replace("{Root}.", "").split(".");
+    let target = obj;
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (target[keys[i]] === undefined) target[keys[i]] = {};
+      target = target[keys[i]];
+    }
+    target[keys[keys.length - 1]] = value;
+  };
 
-            const currentJson = structuredClone(useJson.getState().json);
-            const pathParts = path.split(".");
-            let cursor: any = currentJson;
-            for (let i = 0; i < pathParts.length - 1; i++) {
-                cursor = cursor[pathParts[i]];
-            }
-            cursor[pathParts[pathParts.length - 1]] = parsed;
+  const onSave = () => {
+    try {
+      const parsed = JSON.parse(input);
+      updateNode?.(node.id, parsed);
 
-            useJson.getState().setJson(currentJson);
-            useGraph.getState().setSelectedNode({ path, text: parsed });
+      const json = JSON.parse(jsonText);
+      updateJsonByPath(json, path, parsed);
+      updateJsonText({ contents: JSON.stringify(json, null, 2) });
 
-            setIsEditing(false);
-        } catch (e) {
-            console.error("JSON parse error:", e);
-            alert("Invalid JSON format");
-        }
-    };
-
-
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditValue(nodeData); 
+      setEditMode(false);
+    } catch (error) {
+      alert("Error: Invalid JSON input.");
+    }
   };
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
-      <Stack py="sm" gap="sm">
-        <Stack gap="xs">
-          <Text fz="xs" fw={500}>
-            Content
-          </Text>
-
-          {!isEditing ? (
-            <ScrollArea.Autosize mah={250} maw={600}>
-              <CodeHighlight
-                code={nodeData}
-                miw={350}
-                maw={600}
-                language="json"
-                withCopyButton
+    <Modal opened={opened} onClose={onClose} title="Node Editor" size="auto" centered>
+      <Stack spacing="md">
+        <div>
+          <Text size="sm" weight={500}>Content</Text>
+          <ScrollArea.Autosize maxHeight={300}>
+            {editMode ? (
+              <Textarea
+                value={input}
+                onChange={e => setInput(e.currentTarget.value)}
+                autosize
+                minRows={6}
+                maxRows={12}
+                styles={{ input: { fontFamily: "monospace" } }}
               />
-            </ScrollArea.Autosize>
+            ) : (
+              <CodeHighlight code={defaultText} language="json" withCopyButton />
+            )}
+          </ScrollArea.Autosize>
+        </div>
+
+        <div>
+          <Text size="sm" weight={500}>Path</Text>
+          <ScrollArea.Autosize maxHeight={100}>
+            <CodeHighlight code={path} language="json" withCopyButton />
+          </ScrollArea.Autosize>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          {!editMode ? (
+            <Button color="blue" variant="light" onClick={() => setEditMode(true)}>Edit</Button>
           ) : (
-            <textarea
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              style={{
-                width: "100%",
-                minHeight: "150px",
-                fontFamily: "monospace",
-                padding: "10px",
-              }}
-            />
+            <>
+              <Button color="green" onClick={onSave}>Save</Button>
+              <Button color="gray" onClick={() => {
+                setInput(defaultText);
+                setEditMode(false);
+              }}>
+                Cancel
+              </Button>
+            </>
           )}
-        </Stack>
-
-        <Text fz="xs" fw={500}>
-          JSON Path
-        </Text>
-        <ScrollArea.Autosize maw={600}>
-          <CodeHighlight
-            code={path}
-            miw={350}
-            mah={250}
-            language="json"
-            copyLabel="Copy to clipboard"
-            copiedLabel="Copied to clipboard"
-            withCopyButton
-          />
-        </ScrollArea.Autosize>
-
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            justifyContent: "flex-start",
-            paddingTop: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-                  {!isEditing ? (
-                      <Button
-                          variant="filled"
-                          onClick={() => {
-                              console.log("Edit button clicked");
-                              setIsEditing(true);
-                          }}
-                      >
-                          Edit
-                      </Button>
-                  ) : (
-                          <>
-                              <Button
-                                  color="green"
-                                  variant="filled"
-                                  onClick={() => {
-                                      console.log("Save button clicked");
-                                      handleSave();
-                                  }}
-                              >
-                                  Save
-    </Button>
-                              <Button
-                                  color="red"
-                                  variant="filled"
-                                  onClick={() => {
-                                      console.log("Cancel button clicked");
-                                      handleCancel();
-                                  }}
-                              >
-                                  Cancel
-    </Button>
-                          </>
-                      )}
-
         </div>
       </Stack>
     </Modal>
