@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
 import useConfig from "../../store/useConfig";
 import useFile from "../../store/useFile";
+import useJson from "../../store/useJson";
 
 loader.config({
   paths: {
@@ -23,11 +24,9 @@ const editorOptions: EditorProps["options"] = {
 
 const TextEditor = () => {
   const monaco = useMonaco();
-  const contents = useFile(state => state.contents);
-  const setContents = useFile(state => state.setContents);
+  const json = useJson(state => state.json);
   const setError = useFile(state => state.setError);
   const jsonSchema = useFile(state => state.jsonSchema);
-  const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
 
@@ -48,24 +47,6 @@ const TextEditor = () => {
     });
   }, [jsonSchema, monaco?.languages.json.jsonDefaults]);
 
-  React.useEffect(() => {
-    const beforeunload = (e: BeforeUnloadEvent) => {
-      if (getHasChanges()) {
-        const confirmationMessage =
-          "Unsaved changes, if you leave before saving  your changes will be lost";
-
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-        return confirmationMessage;
-      }
-    };
-
-    window.addEventListener("beforeunload", beforeunload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeunload);
-    };
-  }, [getHasChanges]);
-
   const handleMount: OnMount = useCallback(editor => {
     editor.onDidPaste(() => {
       editor.getAction("editor.action.formatDocument")?.run();
@@ -77,13 +58,13 @@ const TextEditor = () => {
       <StyledWrapper>
         <Editor
           height="100%"
-          language={fileType}
+          language={fileType === "json" ? "json" : fileType}
           theme={theme}
-          value={contents}
+          value={json}
+          key={json} // force re-render on json change
           options={editorOptions}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
           loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
