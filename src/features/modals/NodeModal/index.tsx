@@ -1,6 +1,6 @@
 import React from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -17,6 +17,13 @@ const dataToString = (data: any) => {
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
+
+  // --- Big Green Button Handler ---
+  const handleBigGreenClick = () => {
+    // Add your logic here
+    alert("Big Green Button clicked!");
+  };
+  // --- End Handler ---
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -43,7 +50,26 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             withCopyButton
           />
         </ScrollArea.Autosize>
+          {/* --- Big Green Button Start --- */}
+        <Button
+          onClick={handleBigGreenClick}
+          size="lg"
+          style={{
+            background: "#22c55e",
+            color: "#fff",
+            fontWeight: "bold",
+            border: "2px solid #16a34a",
+            boxShadow: "0 0 8px #22c55e",
+            fontSize: "1.2rem",
+            padding: "0.75rem 2rem",
+            marginTop: "1rem",
+          }}
+        >
+          Big Green Button
+        </Button>
+        {/* --- Big Green Button End --- */}
       </Stack>
     </Modal>
   );
 };
+
