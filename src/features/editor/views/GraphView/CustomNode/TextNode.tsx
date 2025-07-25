@@ -8,6 +8,7 @@ import { isContentImage } from "../lib/utils/calculateNodeSize";
 import useGraph from "../stores/useGraph";
 import { TextRenderer } from "./TextRenderer";
 import * as Styled from "./styles";
+import { MdEdit } from "react-icons/md";
 
 const StyledExpand = styled.button`
   pointer-events: all;
@@ -16,6 +17,22 @@ const StyledExpand = styled.button`
   justify-content: center;
   color: ${({ theme }) => theme.TEXT_NORMAL};
   background: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 36px;
+  border-left: 1px solid ${({ theme }) => theme.BACKGROUND_MODIFIER_ACCENT};
+
+  &:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0 0);
+  }
+`;
+
+const StyledEditButton = styled.button`
+  pointer-events: all;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.TEXT_NORMAL};
+  background: rgba(0, 0, 0, 0.08);
   height: 100%;
   width: 36px;
   border-left: 1px solid ${({ theme }) => theme.BACKGROUND_MODIFIER_ACCENT};
@@ -108,7 +125,9 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
             <StyledExpand aria-label="Expand" onClick={handleExpand}>
               {isExpanded ? <MdLinkOff size={18} /> : <MdLink size={18} />}
             </StyledExpand>
+
           )}
+          
         </StyledTextNodeWrapper>
       )}
     </Styled.StyledForeignObject>
