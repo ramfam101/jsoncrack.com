@@ -3,6 +3,7 @@ import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
 import { create } from "zustand";
 import { SUPPORTED_LIMIT } from "../../../../../constants/graph";
 import useJson from "../../../../../store/useJson";
+import useFile from "../../../../../store/useFile"; // Adjust path if needed
 import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
@@ -62,6 +63,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  setNodeText: (newText: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,37 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  setNodeText: newText => set(state => {
+    if (!state.selectedNode) return {};
+
+    const updatedNode = { ...state.selectedNode, text: newText };
+    const updatedNodes = state.nodes.map(node =>
+      node.id === updatedNode.id ? updatedNode : node
+    );
+
+    const json = useFile.getState().json;
+    const path = updatedNode.path;
+    const updatedJson = JSON.parse(JSON.stringify(json));
+
+    if (path === "{Root}") {
+      useFile.getState().setJson(newText);
+    } else if (path) {
+      const keys = path.replace(/^{Root}\.?/, "").split(".");
+      let obj = updatedJson;
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = /^\d+$/.test(keys[i]) ? Number(keys[i]) : keys[i];
+        obj = obj[key];
+      }
+      const lastKey = /^\d+$/.test(keys[keys.length - 1]) ? Number(keys[keys.length - 1]) : keys[keys.length - 1];
+      obj[lastKey] = newText;
+      useFile.getState().setJson(updatedJson);
+    }
+
+    return {
+      selectedNode: updatedNode,
+      nodes: updatedNodes,
+    };
+  }),
 }));
 
 export default useGraph;
