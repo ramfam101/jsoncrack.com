@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
 import useConfig from "../../store/useConfig";
 import useFile from "../../store/useFile";
+import useJson from "../../store/useJson";
 
 loader.config({
   paths: {
@@ -22,51 +23,33 @@ const editorOptions: EditorProps["options"] = {
 };
 
 const TextEditor = () => {
-  const monaco = useMonaco();
-  const contents = useFile(state => state.contents);
-  const setContents = useFile(state => state.setContents);
-  const setError = useFile(state => state.setError);
-  const jsonSchema = useFile(state => state.jsonSchema);
-  const getHasChanges = useFile(state => state.getHasChanges);
-  const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
-  const fileType = useFile(state => state.format);
+  const monacoInstance = useMonaco();
+  const jsonValue = useJson(state => state.json);
+  const setErrorMsg = useFile(state => state.setError);
+  const schema = useFile(state => state.jsonSchema);
+  const themeMode = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
+  const formatType = useFile(state => state.format);
 
   React.useEffect(() => {
-    monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
-      validate: true,
-      allowComments: true,
-      enableSchemaRequest: true,
-      ...(jsonSchema && {
-        schemas: [
-          {
-            uri: "http://myserver/foo-schema.json",
-            fileMatch: ["*"],
-            schema: jsonSchema,
-          },
-        ],
-      }),
-    });
-  }, [jsonSchema, monaco?.languages.json.jsonDefaults]);
+    if (monacoInstance) {
+      monacoInstance.languages.json.jsonDefaults.setDiagnosticsOptions({
+        validate: true,
+        allowComments: true,
+        enableSchemaRequest: true,
+        ...(schema && {
+          schemas: [
+            {
+              uri: "http://myserver/foo-schema.json",
+              fileMatch: ["*"],
+              schema,
+            },
+          ],
+        }),
+      });
+    }
+  }, [schema, monacoInstance]);
 
-  React.useEffect(() => {
-    const beforeunload = (e: BeforeUnloadEvent) => {
-      if (getHasChanges()) {
-        const confirmationMessage =
-          "Unsaved changes, if you leave before saving  your changes will be lost";
-
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-        return confirmationMessage;
-      }
-    };
-
-    window.addEventListener("beforeunload", beforeunload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeunload);
-    };
-  }, [getHasChanges]);
-
-  const handleMount: OnMount = useCallback(editor => {
+  const handleEditorMount: OnMount = useCallback(editor => {
     editor.onDidPaste(() => {
       editor.getAction("editor.action.formatDocument")?.run();
     });
@@ -77,13 +60,13 @@ const TextEditor = () => {
       <StyledWrapper>
         <Editor
           height="100%"
-          language={fileType}
-          theme={theme}
-          value={contents}
+          language={formatType === "json" ? "json" : formatType}
+          theme={themeMode}
+          value={jsonValue}
+          key={jsonValue}
           options={editorOptions}
-          onMount={handleMount}
-          onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
+          onMount={handleEditorMount}
+          onValidate={errors => setErrorMsg(errors[0]?.message)}
           loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
