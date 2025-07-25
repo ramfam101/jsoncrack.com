@@ -232,7 +232,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     }
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
-  setViewPort: viewPort => set({ viewPort }),
+  setViewPort: viewPort => set({ viewPort })
 }));
 
 export default useGraph;
