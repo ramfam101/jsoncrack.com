@@ -1,48 +1,122 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import {
+  Modal,
+  Stack,
+  Text,
+  ScrollArea,
+  Button,
+  Group,
+  Textarea,
+  Code,
+  Flex,
+} from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
-const dataToString = (data: any) => {
-  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
-  const replacer = (_: string, v: string) => {
-    if (typeof v === "string") return v.replaceAll('"', "");
-    return v;
+export const NodeModal = ({ opened, onClose }: ModalProps) => {
+  const selectedNode = useGraph((state) => state.selectedNode);
+  const updateSelectedNodeText = useGraph((state) => state.updateSelectedNodeText);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedNode?.text) {
+      let text = selectedNode.text;
+      try {
+        // If it's a string that looks like JSON, parse and format it
+        if (typeof text === "string" && text.trim().startsWith("{")) {
+          const parsed = JSON.parse(text);
+          setDraft(JSON.stringify(parsed, null, 2));
+        } else {
+          setDraft(JSON.stringify(text, null, 2));
+        }
+      } catch {
+        // Fallback: show as plain string
+        setDraft(JSON.stringify(String(text)));
+      }
+      setIsEditing(false);
+      setError(null);
+    }
+  }, [selectedNode]);
+
+  const handleSave = () => {
+    try {
+      const parsed = JSON.parse(draft.trim());
+      updateSelectedNodeText(parsed); // ✅ Must exist in your Zustand store
+      setIsEditing(false);
+      setError(null);
+    } catch (e) {
+      setError("Invalid JSON format.");
+    }
   };
 
-  return JSON.stringify(text, replacer, 2);
-};
+  const handleCancel = () => {
+    if (selectedNode?.text) {
+      try {
+        setDraft(JSON.stringify(selectedNode.text, null, 2));
+      } catch {
+        setDraft("");
+      }
+    }
+    setIsEditing(false);
+    setError(null);
+  };
 
-export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
-  const path = useGraph(state => state.selectedNode?.path || "");
+  if (!selectedNode) return null;
+
+  const path = selectedNode?.path || "";
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+    <Modal title="Node Content" size="lg" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
-        <Stack gap="xs">
-          <Text fz="xs" fw={500}>
-            Content
-          </Text>
+        <Flex justify="space-between" align="center">
+          <Text fz="sm" fw={500}>Content</Text>
+          {isEditing ? (
+            <Group gap="xs">
+              <Button size="xs" color="green" onClick={handleSave}>Save</Button>
+              <Button size="xs" variant="light" onClick={handleCancel}>Cancel</Button>
+            </Group>
+          ) : (
+            <Button size="xs" variant="light" onClick={() => setIsEditing(true)}>Edit</Button>
+          )}
+        </Flex>
+
+        {isEditing ? (
+          <>
+            <Textarea
+              autosize
+              minRows={6}
+              maxRows={12}
+              value={draft}
+              onChange={(e) => {
+                setDraft(e.currentTarget.value);
+                setError(null);
+              }}
+              error={!!error}
+            />
+            {error && (
+              <Text c="red" fz="sm" mt={4}>
+                {error}
+              </Text>
+            )}
+          </>
+        ) : (
           <ScrollArea.Autosize mah={250} maw={600}>
-            <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+            <CodeHighlight
+              code={draft}
+              miw={350}
+              maw={600}
+              language="json"
+              withCopyButton
+            />
           </ScrollArea.Autosize>
-        </Stack>
-        <Text fz="xs" fw={500}>
-          JSON Path
-        </Text>
-        <ScrollArea.Autosize maw={600}>
-          <CodeHighlight
-            code={path}
-            miw={350}
-            mah={250}
-            language="json"
-            copyLabel="Copy to clipboard"
-            copiedLabel="Copied to clipboard"
-            withCopyButton
-          />
-        </ScrollArea.Autosize>
+        )}
+
+        <Text fw={500} fz="sm" mt="md">JSON Path</Text>
+        <Code block>{path}</Code>
       </Stack>
     </Modal>
   );
