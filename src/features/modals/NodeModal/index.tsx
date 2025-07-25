@@ -3,6 +3,16 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
+
+function setByPath(obj: any, pathArr: string[], value: any) {
+  let curr = obj;
+  for (let i = 0; i < pathArr.length - 1; i++) {
+    if (!(pathArr[i] in curr)) curr[pathArr[i]] = {};
+    curr = curr[pathArr[i]];
+  }
+  curr[pathArr[pathArr.length - 1]] = value;
+}
 
 const dataToString = (data: any) => {
   if (data === undefined || data === null) return '';
@@ -26,22 +36,33 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     setEditValue(nodeData);
   }, [nodeData, opened]);
 
-  const updateNodeText = useGraph(state => state.updateNodeText);
+  const setContents = useFile(state => state.setContents);
+  const setGraph = useGraph(state => state.setGraph);
 
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(editValue);
-      if (node) {
-        setIsEditing(false);
-        updateNodeText(node.id, parsed);
+      const parsedNode = JSON.parse(editValue);
+      const fileContents = useFile.getState().getContents();
+      const json = JSON.parse(fileContents);
+      const nodePath = path.split(".").filter(Boolean);
+
+      if (!path || path === "{Root}") {
+        setContents({ contents: JSON.stringify(parsedNode, null, 2) });
+      } else {
+        const cleanPath = nodePath[0] === "{Root}" ? nodePath.slice(1) : nodePath;
+        setByPath(json, cleanPath, parsedNode);
+        setContents({ contents: JSON.stringify(json, null, 2) });
       }
+
+      setIsEditing(false);
+      setGraph();
     } catch (e) {
-      alert("Invalid JSON")
+      alert("Invalid JSON");
     }
   }
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+    <Modal title="Node Content" size="auto" opened={opened} onClose={() => { setIsEditing(false); onClose(); }} centered>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
           {!isEditing && (
@@ -49,12 +70,12 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
           )}
           {isEditing && (
             <>
-            <Button onClick={() => handleSave}>Save</Button>
-            <Button onClick={() => setIsEditing(false)}>Discard</Button>
+            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={() => {setIsEditing(false), setEditValue(nodeData)}}>Discard</Button>
             </>
           )}
           <Text fz="xs" fw={500}>
-            Content {isEditing? '(Editing)' : ''}
+            Content
           </Text>
           <ScrollArea.Autosize mah={250} maw={600}>
             {isEditing ? (
@@ -64,7 +85,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                 onChange={e => setEditValue(e.target.value)}
               />
             ) : (
-              <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+              <CodeHighlight code={editValue} miw={350} maw={600} language="json" withCopyButton />
             )}
           </ScrollArea.Autosize>
         </Stack>
