@@ -233,6 +233,15 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateNode: updatedNode => {
+    set(state => ({
+      nodes: state.nodes.map(node =>
+        node.id === updatedNode.id ? { ...node, ...updatedNode } : node
+      ),
+      selectedNode: updatedNode,
+    }));
+  },
 }));
 
 export default useGraph;
+
