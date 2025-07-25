@@ -62,10 +62,46 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeContent: (nodeId: string, newContent: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
+
+    updateNodeContent: (nodeId: string, newContent: string) => {
+    const currentNodes = get().nodes;
+    const selectedNode = get().selectedNode;
+    
+    // Find and update the target node
+    const updatedNodes = currentNodes.map(node => {
+      if (node.id === nodeId) {
+        return {
+          ...node,
+          text: newContent,
+          data: {
+            ...node.data,
+            // Update any other relevant data properties if needed
+          }
+        };
+      }
+      return node;
+    });
+
+    // Update selected node if it's the one being modified
+    const updatedSelectedNode = selectedNode?.id === nodeId 
+      ? { ...selectedNode, text: newContent }
+      : selectedNode;
+
+    set({ 
+      nodes: updatedNodes,
+      selectedNode: updatedSelectedNode
+    });
+
+    // Optional: If you need to update the original JSON source
+    // You might want to reconstruct the JSON and update useJson store
+    // This depends on whether you want the changes to persist
+  },
+    
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
     get().collapseGraph();
@@ -233,6 +269,8 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+    
 }));
 
 export default useGraph;
