@@ -7,6 +7,7 @@ import useJson from "../../../store/useJson";
 import useFile from "../../../store/useFile";
 import "@mantine/code-highlight/styles.css";
 import { Editor } from "@monaco-editor/react";
+import { contentToJson } from "../../../lib/utils/jsonAdapter";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -22,12 +23,11 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
-  const [editedContent, setEditedContent] = useState(nodeData);
-
-
-  useEffect(() => {
-    if (isEditing) setEditedContent(nodeData);
-  }, [isEditing, nodeData]);
+  const contents = useFile(state => state.contents);
+  const setContents = useFile(state => state.setContents);
+  const setJson = useJson(state => state.setJson);
+  const jsonSchema = useFile(state => state.jsonSchema);
+  const getHasChanges = useFile(state => state.getHasChanges);
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -72,8 +72,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
               <Editor
                 language="json"
                 theme="vs-dark"
-                value={editedContent}
-                onChange={value => setEditedContent(value || "")}
+                onChange={contents => setContents({ contents, skipUpdate: true })}
                 height="55vh"
                 options={{
                   minimap: { enabled: false },
@@ -84,9 +83,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
               />
               <Button
                 variant="outline"
-                onClick={() => { //Save changes to json file and update the graph
-                  useJson.getState().setJson(editedContent);
-                  setIsEditing(false);
+                onClick={() => { 
                 }}
                 size="xs"
                 style={{ alignSelf: "flex-end" }}
