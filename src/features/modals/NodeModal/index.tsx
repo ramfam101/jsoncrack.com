@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
 import {
   Modal,
@@ -12,48 +12,60 @@ import {
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
-const dataToString = (data: any) => {
-  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
-  const replacer = (_: string, v: string) => {
-    if (typeof v === "string") return v.replaceAll('"', "");
-    return v;
-  };
-  return JSON.stringify(text, replacer, 2);
+const formatDataAsString = (data: any) => {
+  const cleanData = Array.isArray(data) ? Object.fromEntries(data) : data;
+  const replacer = (_: string, value: any) =>
+    typeof value === "string" ? value.replaceAll('"', "") : value;
+
+  return JSON.stringify(cleanData, replacer, 2);
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const selectedNode = useGraph(state => state.selectedNode);
   const setSelectedNode = useGraph(state => state.setSelectedNode);
-  const path = selectedNode?.path || "";
-
   const [isEditing, setIsEditing] = useState(false);
-  const [tempValue, setTempValue] = useState(() => dataToString(selectedNode?.text));
+  const [tempValue, setTempValue] = useState("");
+
+  useEffect(() => {
+    setTempValue(formatDataAsString(selectedNode?.text));
+  }, [selectedNode]);
 
   const handleSave = () => {
     try {
       const parsed = JSON.parse(tempValue);
-      if (setSelectedNode && selectedNode) {
+
+      if (selectedNode && setSelectedNode) {
         setSelectedNode({
           ...selectedNode,
           text: parsed,
         });
       }
+
       setIsEditing(false);
-    } catch (e) {
-      alert("Invalid JSON");
+    } catch (err) {
+      alert("Invalid JSON. Please check your syntax.");
     }
   };
 
-  const handleCancel = () => {
-    setTempValue(dataToString(selectedNode?.text));
+  const resetEdit = () => {
+    setTempValue(formatDataAsString(selectedNode?.text));
     setIsEditing(false);
   };
 
+  if (!selectedNode) return null;
+
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
-      <Stack py="sm" gap="sm">
-        <Stack gap="xs">
-          <Text fz="xs" fw={500}>Content</Text>
+    <Modal
+      title="Node Content"
+      size="auto"
+      opened={opened}
+      onClose={onClose}
+      centered
+    >
+      <Stack py="sm" spacing="sm">
+        {/* Node Content */}
+        <Stack spacing="xs">
+          <Text size="xs" weight={500}>Content</Text>
           {isEditing ? (
             <>
               <Textarea
@@ -65,22 +77,30 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
               />
               <Group mt="xs">
                 <Button size="xs" color="green" onClick={handleSave}>Save</Button>
-                <Button size="xs" variant="default" onClick={handleCancel}>Cancel</Button>
+                <Button size="xs" variant="default" onClick={resetEdit}>Cancel</Button>
               </Group>
             </>
           ) : (
             <>
               <ScrollArea.Autosize mah={250} maw={600}>
-                <CodeHighlight code={tempValue || ""} miw={350} maw={600} language="json" withCopyButton />
+                <CodeHighlight
+                  code={tempValue || ""}
+                  miw={350}
+                  maw={600}
+                  language="json"
+                  withCopyButton
+                />
               </ScrollArea.Autosize>
               <Button size="xs" mt="xs" onClick={() => setIsEditing(true)}>Edit</Button>
             </>
           )}
         </Stack>
-        <Text fz="xs" fw={500}>JSON Path</Text>
+
+        {/* JSON Path */}
+        <Text size="xs" weight={500}>JSON Path</Text>
         <ScrollArea.Autosize maw={600}>
           <CodeHighlight
-            code={path || ""}
+            code={selectedNode.path || ""}
             miw={350}
             mah={250}
             language="json"
@@ -93,4 +113,3 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     </Modal>
   );
 };
-
