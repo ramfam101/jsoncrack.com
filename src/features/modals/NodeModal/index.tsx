@@ -3,6 +3,9 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import { parseNodePath, setValueAtPath, parseNodeValue } from "../../../lib/utils/nodeUpdateUtils";
+import useFile from "../../../store/useFile";
+import useJson from "../../../store/useJson";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -29,9 +32,39 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   }, [nodeData]);
 
   const handleSave = () => {
-    // TODO: Save logic here (e.g., update the node in the store)
+    try {
+      // Get current JSON
+      const currentJsonString = useJson.getState().getJson();
+      const currentJson = JSON.parse(currentJsonString);
+      
+      // Parse the node path
+      const jsonPath = parseNodePath(path);
+      
+      // Parse the new value
+      const newValue = parseNodeValue(editValue);
+      
+      // Update the JSON at the specific path
+      const updatedJson = setValueAtPath(currentJson, jsonPath, newValue);
+      
+      // Convert back to string with formatting
+      const updatedJsonString = JSON.stringify(updatedJson, null, 2);
+      
+      // Update the file contents (this will trigger the chain of updates)
+      useFile.getState().setContents({ contents: updatedJsonString });
+      
+      setIsEditing(false);
+      
+    } catch (error) {
+      console.error("Error saving node:", error);
+      // Could add error state here if needed
+    }
+  };
+
+ const handleCancel = () => {
+    setEditValue(nodeData); // Reset to original value
     setIsEditing(false);
   };
+
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -79,7 +112,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
           {isEditing && (
             <Stack gap="xs" style={{ flexDirection: "row", justifyContent: "flex-end" }}>
               <button
-                onClick={() => setIsEditing(false)}
+                onClick={handleCancel}
                 style={{
                   padding: "2px 10px",
                   fontSize: "0.9em",
