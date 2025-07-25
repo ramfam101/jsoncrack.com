@@ -3,6 +3,7 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button, Group, Textarea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -11,6 +12,30 @@ const dataToString = (data: any) => {
     return v;
   };
   return JSON.stringify(text, replacer, 2);
+};
+
+// Utility function to update JSON at a given path (supports nested objects/arrays)
+const updateJsonAtPath = (obj: any, path: string, value: any) => {
+  if (!path) return value; // If path is empty, replace the whole object
+
+  // Example path: "fruit" or "car/model"
+  const keys = path.split("/").filter(Boolean);
+  let current = obj;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    // If the key doesn't exist, create an object or array
+    if (current[key] === undefined) {
+      // Try to detect if next key is a number (array index)
+      const nextKey = keys[i + 1];
+      current[key] = /^\d+$/.test(nextKey) ? [] : {};
+    }
+    current = current[key];
+  }
+
+  const lastKey = keys[keys.length - 1];
+  current[lastKey] = value;
+  return obj;
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
@@ -22,17 +47,37 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const [editValue, setEditValue] = useState(nodeData);
   const setNodeText = useGraph(state => state.setNodeText);
 
+  const setContents = useFile(state => state.setContents);
+  const rootJson = useFile(state => state.contents); // Get the current root JSON
+
   React.useEffect(() => {
     setEditValue(nodeData);
     setIsEditing(false);
   }, [nodeData, opened]);
 
+  const sanitizePath = (path: string) => {
+    // Remove {Root}. from the beginning if present
+    return path.replace(/^\{Root\}\./, "");
+  };
+
   const handleSave = () => {
     try {
       const parsed = JSON.parse(editValue);
-      setNodeText(parsed, path);
+
+      const rootJson = useFile.getState().contents;
+      const rootObj = JSON.parse(rootJson);
+
+      // Sanitize the path
+      const cleanPath = sanitizePath(path);
+
+      // Update the node at the correct path in the root JSON
+      const updatedJson = updateJsonAtPath(rootObj, cleanPath, parsed);
+
+      useFile.getState().setContents({ contents: JSON.stringify(updatedJson, null, 2) });
+      useGraph.getState().setNodeText(parsed, cleanPath);
+
       setIsEditing(false);
-    } catch {
+    } catch (err) {
       // Optionally show error
     }
   };
