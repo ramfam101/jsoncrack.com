@@ -1,6 +1,6 @@
 import React from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -14,6 +14,14 @@ const dataToString = (data: any) => {
   return JSON.stringify(text, replacer, 2);
 };
 
+const handleEdit = () => {
+  useGraph(state => {
+    if (state.selectedNode) {
+      state.selectedNode.text = "blahhh";
+    }
+  })
+}
+
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
@@ -21,6 +29,9 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
+        <Button onClick = {handleEdit}> 
+          Edit Node
+        </Button>
         <Stack gap="xs">
           <Text fz="xs" fw={500}>
             Content
@@ -47,3 +58,5 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     </Modal>
   );
 };
+
+
