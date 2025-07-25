@@ -3,6 +3,7 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button, Group, Textarea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useJson from "../../../store/useJson";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -20,6 +21,8 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const setSelectedNode = useGraph(state => state.setSelectedNode);
   const selectedNode = useGraph(state => state.selectedNode);
   const graph = useGraph();
+  const currentJson = useJson(state => state.json);
+  const setJson = useJson(state => state.setJson);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(nodeData);
@@ -29,15 +32,86 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
       setEditedContent(nodeData);
     }
   }, [nodeData, isEditing]);
+  const updateJsonAtPath = (json: string | undefined, path: string, newValue: any) => {
+    if (!json) return { success: false, error: "No JSON content to update" };
+    
+    try {
+      const obj = JSON.parse(json);
+      
+      // If path is empty, root, or references root directly, update the entire JSON
+      if (!path || path === "$" || path === "{Root}") {
+        return { success: true, result: JSON.stringify(newValue, null, 2) };
+      }
+
+      // Clean up path by removing root references and initial dot
+      const cleanPath = path.replace(/^\$\.?/, "").replace(/^{Root}\.?/, "");
+      if (!cleanPath) {
+        return { success: true, result: JSON.stringify(newValue, null, 2) };
+      }
+
+      const parts = cleanPath.split(".");
+      let current = obj;
+
+      for (let i = 0; i < parts.length - 1; i++) {
+        const part = parts[i].replace(/\[\d+\]/, "");
+        const arrayMatch = parts[i].match(/\[(\d+)\]/);
+        if (arrayMatch) {
+          if (!current[part] || !Array.isArray(current[part])) {
+            throw new Error(`Invalid array path at ${part}`);
+          }
+          current = current[part][parseInt(arrayMatch[1])];
+        } else {
+          current = current[part];
+        }
+        
+        if (current === undefined) {
+          throw new Error(`Path segment not found: ${part}`);
+        }
+      }
+
+      // Handle the last part
+      const lastPart = parts[parts.length - 1].replace(/\[\d+\]/, "");
+      const lastArrayMatch = parts[parts.length - 1].match(/\[(\d+)\]/);
+      
+      if (lastArrayMatch) {
+        if (!current[lastPart] || !Array.isArray(current[lastPart])) {
+          throw new Error(`Invalid array at ${lastPart}`);
+        }
+        current[lastPart][parseInt(lastArrayMatch[1])] = newValue;
+      } else {
+        current[lastPart] = newValue;
+      }
+
+      return { success: true, result: JSON.stringify(obj, null, 2) };
+    } catch (err) {
+      return { 
+        success: false, 
+        error: err instanceof Error ? err.message : "Failed to update JSON" 
+      };
+    }
+  };
+
   const handleSave = () => {
     try {
-      const parsedJson = JSON.parse(editedContent);
-      if (selectedNode) {
-        setSelectedNode({ ...selectedNode, text: parsedJson });
+      if (!currentJson || !path) {
+        throw new Error("Missing required data");
       }
-      setIsEditing(false);
+
+      const parsedValue = JSON.parse(editedContent);
+      const update = updateJsonAtPath(currentJson, path, parsedValue);
+      
+      if (!update.success) {
+        throw new Error(update.error);
+      }
+      
+      if (selectedNode) {
+        // This will trigger both graph and file content updates
+        setJson(update.result);
+        setSelectedNode({ ...selectedNode, text: parsedValue });
+        setIsEditing(false);
+      }
     } catch (err) {
-      alert("Invalid JSON");
+      alert(err instanceof Error ? err.message : "Invalid JSON");
     }
   };
 
