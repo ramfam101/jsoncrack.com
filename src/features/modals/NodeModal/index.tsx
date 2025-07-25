@@ -42,13 +42,13 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const selectedNode = useGraph(state => state.selectedNode);
   const nodeData = dataToString(selectedNode?.text);
   const path = selectedNode?.path || "";
-
+  const setSelectedNode = useGraph(state => state.setSelectedNode);
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(nodeData);
-  const setNodeText = useGraph(state => state.setNodeText);
+  const [refreshCount, setRefreshCount] = useState(0);
+  // Removed: setNodeText is not defined in the store
 
   const setContents = useFile(state => state.setContents);
-  const rootJson = useFile(state => state.contents); // Get the current root JSON
 
   React.useEffect(() => {
     setEditValue(nodeData);
@@ -56,7 +56,6 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   }, [nodeData, opened]);
 
   const sanitizePath = (path: string) => {
-    // Remove {Root}. from the beginning if present
     return path.replace(/^\{Root\}\./, "");
   };
 
@@ -67,15 +66,26 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
       const rootJson = useFile.getState().contents;
       const rootObj = JSON.parse(rootJson);
 
-      // Sanitize the path
       const cleanPath = sanitizePath(path);
-
-      // Update the node at the correct path in the root JSON
       const updatedJson = updateJsonAtPath(rootObj, cleanPath, parsed);
 
       useFile.getState().setContents({ contents: JSON.stringify(updatedJson, null, 2) });
-      useGraph.getState().setNodeText(parsed, cleanPath);
-
+      // useGraph.getState().setNodeText(parsed);
+      setSelectedNode({
+        ...selectedNode,
+        id: selectedNode?.id ?? "", // Ensure id is always a string
+        text: parsed,
+        width: selectedNode?.width ?? 0,
+        height: selectedNode?.height ?? 0,
+        path: selectedNode?.path ?? "",
+        data: selectedNode?.data ?? {
+          type: 'object', // Replace with a valid NodeType
+          isParent: false,
+          isEmpty: false,
+          childrenCount: 0,
+        },
+      });
+      // Just exit edit mode; the modal will rerender and show the latest value from the store
       setIsEditing(false);
     } catch (err) {
       // Optionally show error
@@ -83,12 +93,27 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   };
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+    <Modal
+      key={refreshCount}
+      title="Node Content"
+      size="auto"
+      opened={opened}
+      onClose={onClose}
+      centered
+    >
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
           <Group justify="space-between" align="center">
             <Text fz="xs" fw={500}>Content</Text>
-            {!isEditing && (
+            {isEditing ? (
+              <Group gap={4}>
+                <Button color="green" size="xs" onClick={() => {handleSave(); setIsEditing(false);}}>Save</Button>
+                <Button variant="default" size="xs" onClick={() => {
+                  setEditValue(dataToString(selectedNode?.text)); // Reset to latest value
+                  setIsEditing(false);
+                }}>Cancel</Button>
+              </Group>
+            ) : (
               <Button size="xs" onClick={() => setIsEditing(true)}>Edit</Button>
             )}
           </Group>
@@ -105,15 +130,9 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                 styles={{ input: { fontFamily: "monospace" } }}
               />
             ) : (
-              <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+              <CodeHighlight code={dataToString(selectedNode?.text)} miw={350} maw={600} language="json" withCopyButton />
             )}
           </ScrollArea.Autosize>
-          {isEditing && (
-            <Group mt={8} justify="flex-end">
-              <Button color="green" size="xs" onClick={handleSave}>Save</Button>
-              <Button variant="default" size="xs" onClick={() => setIsEditing(false)}>Cancel</Button>
-            </Group>
-          )}
         </Stack>
         <Text fz="xs" fw={500}>JSON Path</Text>
         <ScrollArea.Autosize maw={600}>
