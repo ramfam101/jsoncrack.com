@@ -4,6 +4,7 @@ import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import { FaLastfmSquare } from "react-icons/fa";
+import { Content } from "next/font/google";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -27,11 +28,21 @@ function json_viewer(nodeData, setEditting) {
 }
 
 function json_editor(nodeData, setEditting) {
+  var json_string = '';
+  if (nodeData != undefined) {
+    var json = JSON.parse(nodeData);
+    json_string = JSON.stringify(json, null, 4);
+  }
   return (
     <div id="json">
-      <input type="text" value={nodeData} />
+      < value={json_string} style={{ minWidth: 350, maxWidth: 600, maxHeight: 250, height="auto" }} />
     </div>
   );
+}
+
+function closeThingy(setEditting, onClose) {
+  setEditting(false);
+  onClose();
 }
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
@@ -40,7 +51,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   var [editting, setEditting] = useState(false);
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+    <Modal title="Node Content" size="auto" opened={opened} onClose={() => closeThingy(setEditting, onClose)} centered>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
           <Text fz="xs" fw={500}>
