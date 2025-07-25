@@ -62,6 +62,8 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeValue: (id: string, newValue: any) => void; // <-- Added
+  updateEditorJson: () => void; // <-- Added
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,28 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  // --- Add these methods for editing ---
+  updateNodeValue: (id, newValue) => {
+    set(state => ({
+      nodes: state.nodes.map(node =>
+        node.id === id
+          ? { ...node, text: newValue }
+          : node
+      ),
+    }));
+  },
+  updateEditorJson: () => {
+    // Sync the left-hand editor with the current graph nodes
+    // This assumes you have a useJson store with a setJson method
+    const nodes = get().nodes;
+    // You may need to reconstruct the JSON from nodes, here's a simple example:
+    // If your graph is a tree, you may want to find the root and build from there.
+    // For now, let's just take the first node's text as the new JSON:
+    if (nodes.length > 0) {
+      useJson.getState().setJson(JSON.stringify(nodes[0].text, null, 2));
+    }
+  },
 }));
 
 export default useGraph;
