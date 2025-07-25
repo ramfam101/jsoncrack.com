@@ -11,15 +11,18 @@ export const FileMenu = () => {
   const getContents = useFile(state => state.getContents);
   const getFormat = useFile(state => state.getFormat);
 
-  const handleSave = () => {
-    const a = document.createElement("a");
-    const file = new Blob([getContents()], { type: "text/plain" });
+const handleSave = () => {
+  const a = document.createElement("a");
+  const file = new Blob([getContents()], { type: "text/plain" });
 
-    a.href = window.URL.createObjectURL(file);
-    a.download = `jsoncrack.${getFormat()}`;
-    a.click();
+  const url = window.URL.createObjectURL(file);
+  a.href = url;
+  a.download = `jsoncrack.${getFormat()}`;
+  a.click();
 
-    gaEvent("save_file", { label: getFormat() });
+  window.URL.revokeObjectURL(url); // Clean up
+
+  gaEvent("save_file", { label: getFormat() });
   };
 
   return (
