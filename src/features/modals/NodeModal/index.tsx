@@ -36,7 +36,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   return (
     <Modal
     title={
-    <Group justify="right" align="right">
+    <Group justify="left" align="left">
       <Text>Node Content</Text>
       {editing ? (
         <Button size="xs" variant="light" onClick={handleSave}>Save</Button>
