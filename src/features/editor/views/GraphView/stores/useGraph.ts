@@ -48,6 +48,8 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateSelectedNode: (newText: any) => void;
+  updateNodeByPath: (path: string, newValue: any) => void; // <-- Added
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -64,6 +66,21 @@ interface GraphActions {
   setZoomFactor: (zoomFactor: number) => void;
 }
 
+// Helper to set a value at a given path in an object
+function setValueAtPath(obj: any, path: string, value: any) {
+  if (!path) return;
+  const keys = path
+    .replace(/\[(\w+)\]/g, '.$1')
+    .replace(/^\./, '')
+    .split('.');
+  let temp = obj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!(keys[i] in temp)) temp[keys[i]] = {};
+    temp = temp[keys[i]];
+  }
+  temp[keys[keys.length - 1]] = value;
+}
+
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
   toggleCollapseAll: collapseAll => {
@@ -74,6 +91,36 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateSelectedNode: newText => set(state => ({
+    selectedNode: state.selectedNode
+      ? { ...state.selectedNode, text: newText }
+      : null,
+  })),
+  // --- ADDED: updateNodeByPath ---
+  updateNodeByPath: (path, newValue) => {
+  const jsonStore = useJson.getState();
+  let currentJson: any = {};
+  if (typeof jsonStore.json === "string") {
+    currentJson = JSON.parse(jsonStore.json);
+  } else if (jsonStore.json && typeof jsonStore.json === "object") {
+    currentJson = JSON.parse(JSON.stringify(jsonStore.json));
+  }
+  setValueAtPath(currentJson, path, newValue);
+  if (typeof jsonStore.setJson === "function") {
+    jsonStore.setJson(currentJson);
+  }
+  const { nodes, edges } = parser(currentJson);
+  const selectedNode = get().selectedNode;
+  set({
+    nodes,
+    edges,
+    selectedNode:
+      selectedNode && selectedNode.path === path
+        ? { ...selectedNode, text: newValue, id: selectedNode.id ?? "" }
+        : selectedNode,
+  });
+},
+  // --- END ADDED ---
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
