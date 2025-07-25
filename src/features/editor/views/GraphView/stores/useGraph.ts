@@ -1,6 +1,6 @@
 import type { ViewPort } from "react-zoomable-ui/dist/ViewPort";
 import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
-import { create } from "zustand";
+import create from "zustand";
 import { SUPPORTED_LIMIT } from "../../../../../constants/graph";
 import useJson from "../../../../../store/useJson";
 import type { EdgeData, NodeData } from "../../../../../types/graph";
@@ -62,9 +62,10 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (id: string, newText: string) => void;
 }
 
-const useGraph = create<Graph & GraphActions>((set, get) => ({
+export const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
@@ -233,6 +234,25 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateNode: (id, newText) =>
+    set(state => {
+      // Update the graph nodes
+      const updatedNodes = state.nodes.map(node =>
+        node.id === id ? { ...node, text: newText } : node
+      );
+      // Update the selected node
+      const updatedSelectedNode =
+        state.selectedNode && state.selectedNode.id === id
+          ? { ...state.selectedNode, text: newText }
+          : state.selectedNode;
+      // Update the main JSON data
+      useJson.getState().updateJsonByNodeId(id, newText);
+
+      return {
+        nodes: updatedNodes,
+        selectedNode: updatedSelectedNode,
+      };
+    }),
 }));
 
 export default useGraph;
