@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button, Group } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -15,11 +15,36 @@ const dataToString = (data: any) => {
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
-  const path = useGraph(state => state.selectedNode?.path || "");
+  const originalNodeData = useGraph(state => dataToString(state.selectedNode?.text));
+  const originalPath = useGraph(state => state.selectedNode?.path || "");
+
+  const [nodeData, setNodeData] = useState(originalNodeData);
+  const [path, setPath] = useState(originalPath);
+
+  const handleButtonClick = () => {
+    // Update the nodeData and path with the latest values from useGraph
+    const updatedNodeData = useGraph(state => dataToString(state.selectedNode?.text));
+    const updatedPath = useGraph(state => state.selectedNode?.path || "");
+
+    setNodeData(updatedNodeData);
+    setPath(updatedPath);
+  };
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+    <Modal
+      title={
+        <Group position="apart" style={{ width: "100%" }}>
+          <Text>Node Content</Text>
+          <Button size="xs" onClick={handleButtonClick}>
+            Update Content
+          </Button>
+        </Group>
+      }
+      size="auto"
+      opened={opened}
+      onClose={onClose}
+      centered
+    >
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
           <Text fz="xs" fw={500}>
