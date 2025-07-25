@@ -95,7 +95,7 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           data-x={x}
           data-y={y}
           data-key={JSON.stringify(text)}
-          $hasCollapse={isParent && collapseButtonVisible}
+          $hasCollapse={!isParent ? true : (isParent && collapseButtonVisible)}
           $isParent={isParent}
         >
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
