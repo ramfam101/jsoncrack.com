@@ -4,6 +4,7 @@ import { Stack, Modal, Select, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import { event as gaEvent } from "nextjs-google-analytics";
 import useJson from "../../../store/useJson";
+import useFile from "../../../store/useFile";
 
 enum Language {
   TypeScript = "typescript",
@@ -49,6 +50,7 @@ const typeOptions = [
 
 export const TypeModal = ({ opened, onClose }: ModalProps) => {
   const getJson = useJson(state => state.getJson);
+  const setContents = useFile(state => state.setContents);
   const [type, setType] = React.useState("");
   const [selectedType, setSelectedType] = React.useState<Language>(Language.TypeScript);
 
@@ -88,6 +90,10 @@ export const TypeModal = ({ opened, onClose }: ModalProps) => {
       }
     }
   }, [getJson, opened, selectedType, transformer]);
+
+  React.useEffect(() => {
+    setContents(type);
+  }, [setContents, type]);
 
   return (
     <Modal title="Generate Types" size="lg" opened={opened} onClose={onClose} centered>
