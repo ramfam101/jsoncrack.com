@@ -41,7 +41,6 @@ const initialStates: Graph = {
   path: "",
   aboveSupportedLimit: false,
 };
-
 interface GraphActions {
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
   setLoading: (loading: boolean) => void;
@@ -62,6 +61,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeContent: (path: string, newContent: any) => void; // Add this line
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -74,6 +74,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
@@ -233,6 +234,27 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  updateNodeContent: (path: string, newContent: any) => {
+  set((state) => {
+    const node = state.nodes.find((node) => node.path === path);
+    if (node) {
+      // Ensure node.text is an object before spreading
+      const currentText = typeof node.text === "object" && node.text !== null ? node.text : {};
+      node.text = { ...currentText, ...newContent }; // Merge the new content with the existing content
+    }
+    return state;
+  });
+
+  // Update selectedNode to reflect the changes
+  const updatedNode = get().nodes.find(node => node.path === path);
+  set({ selectedNode: updatedNode });
+
+  // Refresh the graph
+  const updatedNodes = get().nodes;
+  const updatedEdges = get().edges;
+  get().setGraph(JSON.stringify({ nodes: updatedNodes, edges: updatedEdges }));
+},
 }));
 
 export default useGraph;
