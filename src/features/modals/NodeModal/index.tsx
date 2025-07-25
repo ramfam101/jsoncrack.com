@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
@@ -18,6 +18,14 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(nodeData);
+
+  React.useEffect(() => {
+    setEditValue(nodeData);
+    setIsEditing(false);
+  }, [nodeData]);
+  
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
@@ -42,6 +50,21 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             copiedLabel="Copied to clipboard"
             withCopyButton
           />
+          <Text fz="xs" fw={500}>
+          JSON Path
+        </Text>
+        <ScrollArea.Autosize maw={600}>
+          <CodeHighlight
+            code={path}
+            miw={350}
+            mah={250}
+            language="json"
+            copyLabel="Copy to clipboard"
+            copiedLabel="Copied to clipboard"
+            withCopyButton
+          />
+        </ScrollArea.Autosize>
+        <button>Edit</button>
         </ScrollArea.Autosize>
       </Stack>
     </Modal>
