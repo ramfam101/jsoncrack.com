@@ -84,6 +84,7 @@ const isURL = (value: string) => {
   );
 };
 
+// This triggers the graph and json store update after a debounce
 const debouncedUpdateJson = debounce((value: unknown) => {
   useGraph.getState().setLoading(true);
   useJson.getState().setJson(JSON.stringify(value, null, 2));
@@ -138,6 +139,7 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
         set({ hasChanges: true });
       }
 
+      // This triggers the graph and json update
       debouncedUpdateJson(json);
     } catch (error: any) {
       if (error?.mark?.snippet) return set({ error: error.mark.snippet });
