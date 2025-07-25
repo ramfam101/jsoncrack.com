@@ -3,6 +3,7 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import { Button } from "@mantine/core";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -28,6 +29,9 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
           <ScrollArea.Autosize mah={250} maw={600}>
             <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
           </ScrollArea.Autosize>
+          <Button variant="outline" size="xs" mt="xs">
+            Edit
+          </Button>
         </Stack>
         <Text fz="xs" fw={500}>
           JSON Path
