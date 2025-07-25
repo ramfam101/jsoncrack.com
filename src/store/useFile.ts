@@ -53,6 +53,7 @@ interface JsonActions {
   setFile: (fileData: File) => void;
   setJsonSchema: (jsonSchema: object | null) => void;
   checkEditorSession: (url: Query, widget?: boolean) => void;
+  updateNodeValue: (path: string, newValue: string) => void;
 }
 
 export type File = {
@@ -174,6 +175,119 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
     if (format) set({ format });
     get().setContents({ contents, hasChanges: false });
   },
+  updateNodeValue: (path, newValue) => {
+    try {
+      console.log('Updating node value:', { path, newValue });
+      const currentJson = JSON.parse(get().contents);
+      
+      // Parse the path to navigate the JSON object
+      // Remove {Root} or Root[x] prefix and handle the path
+      let cleanPath = path.replace(/^\{?Root\}?(\[\d+\])?\.?/, '');
+      console.log('Clean path:', cleanPath);
+      
+      if (cleanPath === '') {
+        // Replacing the entire root value
+        const updatedJson = parseValue(newValue);
+        const updatedContents = JSON.stringify(updatedJson, null, 2);
+        get().setContents({ contents: updatedContents });
+        return;
+      }
+      
+      if (cleanPath.startsWith('[') && cleanPath.includes(']')) {
+        // Handle array root case
+        const arrayIndex = parseInt(cleanPath.match(/\[(\d+)\]/)?.[1] || '0');
+        cleanPath = cleanPath.replace(/^\[\d+\]\.?/, '');
+        
+        if (Array.isArray(currentJson)) {
+          if (cleanPath) {
+            setValueAtPath(currentJson[arrayIndex], cleanPath, parseValue(newValue));
+          } else {
+            currentJson[arrayIndex] = parseValue(newValue);
+          }
+        }
+      } else {
+        // Handle object root case
+        setValueAtPath(currentJson, cleanPath, parseValue(newValue));
+      }
+      
+      const updatedContents = JSON.stringify(currentJson, null, 2);
+      console.log('Updated contents:', updatedContents);
+      get().setContents({ contents: updatedContents });
+    } catch (error) {
+      console.error('Error updating node value:', error);
+      toast.error('Failed to update node value');
+    }
+  },
 }));
+
+// Helper function to set value at a given path
+function setValueAtPath(obj: any, path: string, value: any) {
+  console.log('setValueAtPath called with:', { obj, path, value });
+  
+  if (!path) {
+    throw new Error('Path is empty');
+  }
+  
+  const parts = path.split('.');
+  let current = obj;
+  
+  for (let i = 0; i < parts.length - 1; i++) {
+    const part = parts[i];
+    const arrayMatch = part.match(/^(.+)\[(\d+)\]$/);
+    
+    if (arrayMatch) {
+      const [, key, index] = arrayMatch;
+      if (current[key] && Array.isArray(current[key])) {
+        current = current[key][parseInt(index)];
+      } else {
+        throw new Error(`Invalid array access: ${key}[${index}]`);
+      }
+    } else {
+      if (current[part] !== undefined) {
+        current = current[part];
+      } else {
+        throw new Error(`Property ${part} not found`);
+      }
+    }
+  }
+  
+  const lastPart = parts[parts.length - 1];
+  const arrayMatch = lastPart.match(/^(.+)\[(\d+)\]$/);
+  
+  if (arrayMatch) {
+    const [, key, index] = arrayMatch;
+    if (current[key] && Array.isArray(current[key])) {
+      current[key][parseInt(index)] = value;
+    } else {
+      throw new Error(`Invalid array access: ${key}[${index}]`);
+    }
+  } else {
+    current[lastPart] = value;
+  }
+  
+  console.log('Successfully updated value');
+}
+
+// Helper function to parse the new value (try to maintain type)
+function parseValue(value: string): any {
+  if (value === 'null') return null;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (value === 'undefined') return undefined;
+  
+  // Try to parse as number
+  const numValue = Number(value);
+  if (!isNaN(numValue) && isFinite(numValue) && value.trim() !== '') {
+    return numValue;
+  }
+  
+  // Try to parse as JSON (for objects/arrays)
+  try {
+    return JSON.parse(value);
+  } catch {
+    // Return as string if all else fails
+    return value;
+  }
+}
 
 export default useFile;
