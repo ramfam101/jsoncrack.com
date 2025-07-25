@@ -3,6 +3,7 @@ import { LoadingOverlay } from "@mantine/core";
 import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
 import useConfig from "../../store/useConfig";
+import useGraph from "./views/GraphView/stores/useGraph";
 import useFile from "../../store/useFile";
 
 loader.config({
@@ -10,6 +11,8 @@ loader.config({
     vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs",
   },
 });
+
+
 
 const editorOptions: EditorProps["options"] = {
   formatOnPaste: true,
@@ -30,6 +33,14 @@ const TextEditor = () => {
   const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
+  // Removed: const setGraphFromContents = useFile(state => state.setGraphFromContents);
+  const selectedNode = useGraph(state => state.selectedNode);
+
+  // React.useEffect(() => {
+  //   if (selectedNode?.text) {
+  //     setContents({ contents: JSON.stringify(selectedNode.text, null, 2), skipUpdate: true });
+  //   }
+  // }, [selectedNode]);
 
   React.useEffect(() => {
     monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -59,6 +70,8 @@ const TextEditor = () => {
       }
     };
 
+    // Removed: const setGraphFromContents = useFile(state => state.setGraphFromContents);
+
     window.addEventListener("beforeunload", beforeunload);
 
     return () => {
@@ -72,6 +85,10 @@ const TextEditor = () => {
     });
   }, []);
 
+  function setGraphFromContents() {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <StyledEditorWrapper>
       <StyledWrapper>
@@ -83,8 +100,11 @@ const TextEditor = () => {
           options={editorOptions}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
-          loading={<LoadingOverlay visible />}
+  onChange={contents => {
+    setContents({ contents, skipUpdate: true });
+    setGraphFromContents(); // <-- Add this line
+  }}
+  loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
     </StyledEditorWrapper>
