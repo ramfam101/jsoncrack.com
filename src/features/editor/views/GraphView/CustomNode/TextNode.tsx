@@ -1,4 +1,3 @@
-import React, { useMemo } from "react";
 import styled from "styled-components";
 import { MdLink, MdLinkOff } from "react-icons/md";
 import type { CustomNodeProps } from ".";
@@ -7,7 +6,32 @@ import useConfig from "../../../../../store/useConfig";
 import { isContentImage } from "../lib/utils/calculateNodeSize";
 import useGraph from "../stores/useGraph";
 import { TextRenderer } from "./TextRenderer";
-import * as Styled from "./styles";
+import * as Styled from "./styles"
+import React, { useMemo, useState } from "react"; // Replace existing React import
+
+const StyledEditButton = styled.button`
+  margin-left: 8px;
+  padding: 2px 6px;
+  font-size: 12px;
+  background: ${({ theme }) => theme.BACKGROUND_MODIFIER_ACCENT};
+  color: ${({ theme }) => theme.TEXT_NORMAL};
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  z-index: 3; // Increase z-index
+  position: relative; // Add this line
+  &:hover {
+    background: ${({ theme }) => theme.BACKGROUND_MODIFIER_ACTIVE};
+  }
+`;
+
+const StyledEditInput = styled.input`
+  margin-left: 8px;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  border: 1px solid ${({ theme }) => theme.BACKGROUND_MODIFIER_ACCENT};
+`;
 
 const StyledExpand = styled.button`
   pointer-events: all;
@@ -27,13 +51,16 @@ const StyledExpand = styled.button`
 
 const StyledTextNodeWrapper = styled.span<{ $hasCollapse: boolean; $isParent: boolean }>`
   display: flex;
+  position: relative;
+  z-index: 2; // Add this line
   justify-content: ${({ $hasCollapse, $isParent }) =>
     $hasCollapse ? "space-between" : $isParent ? "center" : "flex-start"};
   align-items: center;
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
   padding: ${({ $hasCollapse }) => ($hasCollapse ? "0" : "0 10px")};
+  gap: 7px; // Add gap for spacing
 `;
 
 const StyledImageWrapper = styled.div`
@@ -64,6 +91,27 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   const isImage = imagePreviewEnabled && isContentImage(text as string);
   const value = JSON.stringify(text).replaceAll('"', "");
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    console.log("Edit button clicked");
+    setIsEditing(true);
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditValue(e.target.value);
+  };
+
+  const handleEditSave = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setIsEditing(false);
+      // This only updates local state, not the global store
+      // To update globally, call your store update function here
+    }
+  };
+
   const handleExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -79,6 +127,7 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   }, [childrenCount, type]);
 
   return (
+
     <Styled.StyledForeignObject
       data-id={`node-${node.id}`}
       width={width}
@@ -98,17 +147,32 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           $hasCollapse={isParent && collapseButtonVisible}
           $isParent={isParent}
         >
+
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
-            <TextRenderer>{value}</TextRenderer>
+            <TextRenderer>{isEditing ? editValue : value}</TextRenderer>
           </Styled.StyledKey>
+
           {isParent && childrenCount > 0 && childrenCountVisible && (
             <Styled.StyledChildrenCount>{childrenCountText}</Styled.StyledChildrenCount>
           )}
+
           {isParent && hasCollapse && collapseButtonVisible && (
             <StyledExpand aria-label="Expand" onClick={handleExpand}>
               {isExpanded ? <MdLinkOff size={18} /> : <MdLink size={18} />}
             </StyledExpand>
           )}
+
+          {isEditing ? (
+            <StyledEditInput
+              value={editValue}
+              onChange={handleEditChange}
+              onKeyDown={handleEditSave}
+              autoFocus
+            />
+          ) : (
+            <StyledEditButton onClick={handleEditClick}>Edit</StyledEditButton>
+          )}
+
         </StyledTextNodeWrapper>
       )}
     </Styled.StyledForeignObject>
@@ -122,5 +186,4 @@ function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
     prev.node.data.childrenCount === next.node.data.childrenCount
   );
 }
-
 export const TextNode = React.memo(Node, propsAreEqual);
