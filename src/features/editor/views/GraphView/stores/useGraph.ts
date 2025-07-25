@@ -62,6 +62,8 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (newText: any) => void;
+  updateNodeAndJson: (newText: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,62 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateSelectedNodeText: newText => set(state => {
+    if (!state.selectedNode) return {};
+    const selectedId = state.selectedNode.id;
+    const updatedNodes = state.nodes.map(node =>
+      node.id === selectedId
+        ? { ...node, text: newText }
+        : node
+    );
+    return {
+      nodes: updatedNodes,
+      selectedNode: { ...state.selectedNode, text: newText }
+    };
+  }),
+  updateNodeAndJson: newText => set(state => {
+    if (!state.selectedNode) return {};
+    const selectedId = state.selectedNode.id;
+    const updatedNodes = state.nodes.map(node =>
+      node.id === selectedId
+        ? { ...node, text: newText }
+        : node
+    );
+
+    // Update the global JSON using useJson store
+    // This assumes each node maps to a path in the JSON
+    // You may need to adjust this logic for your structure
+    const path = state.selectedNode.path;
+    if (path) {
+      useJson.getState().updateJsonAtPath(path, newText);
+    }
+
+    return {
+      nodes: updatedNodes,
+      selectedNode: { ...state.selectedNode, text: newText }
+    };
+  }),
 }));
 
 export default useGraph;
+
+// Remove the example DiagramNode from this file!
+// Move this code to its own file, e.g., src/features/editor/views/GraphView/DiagramNode.tsx
+
+// Example usage in a React component (not in the store file):
+/*
+import useGraph from "../../stores/useGraph";
+
+export const DiagramNode = ({ nodeId }: { nodeId: string }) => {
+  const node = useGraph(state => state.nodes.find(n => n.id === nodeId));
+
+  if (!node) return null;
+
+  return (
+    <div className="diagram-node">
+      <strong>{node.label || node.id}</strong>
+      <pre>{typeof node.text === "object" ? JSON.stringify(node.text, null, 2) : String(node.text)}</pre>
+    </div>
+  );
+};
+*/
