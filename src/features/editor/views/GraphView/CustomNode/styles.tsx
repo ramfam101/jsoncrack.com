@@ -70,8 +70,6 @@ export const StyledKey = styled.span<{ $parent?: boolean; $type: string; $value?
   justify-content: center; // Always center for parent nodes
   flex: 1;
   min-width: 0;
-  height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "auto")};
-  line-height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "inherit")};
   padding: 0; // Remove padding
   color: ${({ theme, $type, $parent = false, $value = "" }) =>
     getTextColor({ $parent, $type, $value, theme })};
