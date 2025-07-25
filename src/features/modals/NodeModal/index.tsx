@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
-import useJsonQuery from "../../../hooks/useJsonQuery";
+import useJson from "../../../store/useJson";
+import useFile from "../../../store/useFile";
+import "@mantine/code-highlight/styles.css";
+import { Editor } from "@monaco-editor/react";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -19,6 +22,12 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
+  const [editedContent, setEditedContent] = useState(nodeData);
+
+
+  useEffect(() => {
+    if (isEditing) setEditedContent(nodeData);
+  }, [isEditing, nodeData]);
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -51,35 +60,43 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
         {isEditing && (
           <Modal
             title="Edit Node Content"
-            size="auto"
+            size="100vh"
             opened={isEditing}
             onClose={() => setIsEditing(false)}
             centered
           >
-            <Stack py="sm" gap="sm">
+            <Stack py="xl" gap="xl" style={{ height: "100%" }}>
               <Text fz="xs" fw={500}>
                 Edit the content of the node below:
               </Text>
-              <CodeHighlight
-                code={nodeData}
-                miw={350}
-                maw={600}
+              <Editor
                 language="json"
-                withCopyButton
-                contentEditable
-                style={{ whiteSpace: "pre-wrap", wordBreak: "break-all" }}
+                theme="vs-dark"
+                value={editedContent}
+                onChange={value => setEditedContent(value || "")}
+                height="55vh"
+                options={{
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  readOnly: false,
+                }}
               />
-              <Button variant="outline" 
-              onClick={(e) => {
-                const newContent = e.currentTarget.textContent || ""; 
-                useJsonQuery().updateJson(newContent);
-              }} size="xs" style={{ alignSelf: "flex-end" }}>
-              Save Changes
+              <Button
+                variant="outline"
+                onClick={() => { //Save changes to json file and update the graph
+                  useJson.getState().setJson(editedContent);
+                  setIsEditing(false);
+                }}
+                size="xs"
+                style={{ alignSelf: "flex-end" }}
+              >
+                Save Changes
+              </Button>
+              <Button variant="outline" onClick={() => setIsEditing(false)} size="xs" style={{ alignSelf: "flex-end" }}>
+                Cancel
               </Button>
             </Stack>
-            <Button variant="outline" onClick={() => setIsEditing(false)} size="xs" style={{ alignSelf: "flex-end" }}>
-              Cancel  
-            </Button>
           </Modal>
         )}
       </Stack>
