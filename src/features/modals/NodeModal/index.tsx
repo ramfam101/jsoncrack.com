@@ -1,6 +1,6 @@
 import React from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -17,6 +17,7 @@ const dataToString = (data: any) => {
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
+  const updateNode = useGraph(state => state.updateNode);
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -43,6 +44,16 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             withCopyButton
           />
         </ScrollArea.Autosize>
+        <Button
+          onClick={() => {
+            const newValue = prompt("Edit Node Content", nodeData);
+            if (newValue !== null) {
+              updateNode(newValue);
+            }
+          }}
+        >
+          Edit Node
+        </Button>
       </Stack>
     </Modal>
   );
