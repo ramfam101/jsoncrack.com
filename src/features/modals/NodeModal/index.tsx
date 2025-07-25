@@ -1,6 +1,6 @@
 import React from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -14,12 +14,31 @@ const dataToString = (data: any) => {
   return JSON.stringify(text, replacer, 2);
 };
 
+export const NodeModa = ({ opened, onClose }: ModalProps) => {
+  const nodeData = useGraph(state => state.selectedNode);
+  const Click = () => {
+    if (nodeData) {
+      const text = dataToString(nodeData.text);
+      navigator.clipboard.writeText(text);
+    }
+  };
+
+  return(
+    <Button fz="l" fw={500} onClick={Click}>
+      Copy Node Data
+    </Button>
+  )
+};
+
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
+      <Button fz="l" fw={500} onClick={() => navigator.clipboard.writeText(nodeData)}>
+        Edit
+      </Button>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
           <Text fz="xs" fw={500}>
@@ -47,3 +66,4 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     </Modal>
   );
 };
+
