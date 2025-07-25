@@ -1,7 +1,7 @@
 describe('NodeModal Edit Button Visibility', () => {
-  let editCount = 0;
-  let saveCount = 0;
-  let cancelCount = 0;
+  let editCount = 1;
+  let saveCount = 1;
+  let cancelCount = 1;
 
   beforeEach(() => {
     cy.visit('http://localhost:3000/editor');
