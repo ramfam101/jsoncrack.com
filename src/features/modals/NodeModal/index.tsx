@@ -3,6 +3,9 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button, Textarea, Group } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useJson from "../../../store/useJson";
+import useFile from "../../../store/useFile";
+
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -35,8 +38,68 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(editableContent);
-      updateNode(selectedNode!.id, parsed);
+      let parsed = JSON.parse(editableContent);
+      const nodeId = selectedNode!.id;
+
+      // Normalize array of entries to object
+      if (
+        Array.isArray(parsed) &&
+        parsed.every(entry => Array.isArray(entry) && entry.length === 2)
+      ) {
+        parsed = Object.fromEntries(parsed);
+      }
+
+      updateNode(nodeId, parsed);
+
+      let fullJson = JSON.parse(useFile.getState().contents);
+      const rawPath = useGraph.getState().path;
+
+      const applyAtPath = (obj: any, path: string, value: any) => {
+        if (!path) {
+          // Root replacement
+          return value;
+        }
+
+        const parts = path
+          .replace(/\[(\d+)\]/g, ".$1")
+          .split(".")
+          .filter(Boolean);
+
+        let current = obj;
+        for (let i = 0; i < parts.length - 1; i++) {
+          const key = parts[i];
+          const isIndex = !isNaN(Number(key));
+          if (isIndex) {
+            const index = Number(key);
+            if (!Array.isArray(current)) current = [];
+            if (!current[index]) current[index] = {};
+            current = current[index];
+          } else {
+            if (!current[key] || typeof current[key] !== "object") {
+              current[key] = {};
+            }
+            current = current[key];
+          }
+        }
+
+        const lastKey = parts[parts.length - 1];
+        const isLastIndex = !isNaN(Number(lastKey));
+        if (isLastIndex) {
+          current[Number(lastKey)] = value;
+        } else {
+          current[lastKey] = value;
+        }
+
+        return obj;
+      };
+
+      // ✅ Capture the updated root (in case it's replaced)
+      const updatedJson = applyAtPath(fullJson, rawPath, parsed);
+
+      // Save
+      const updatedJsonString = JSON.stringify(updatedJson, null, 2);
+      useFile.getState().setContents({ contents: updatedJsonString });
+
       setIsEditing(false);
       onClose?.();
     } catch (err) {

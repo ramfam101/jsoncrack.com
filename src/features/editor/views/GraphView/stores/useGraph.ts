@@ -10,6 +10,7 @@ import { getOutgoers } from "../lib/utils/getOutgoers";
 
 
 
+
 export interface Graph {
   viewPort: ViewPort | null;
   direction: CanvasDirection;
