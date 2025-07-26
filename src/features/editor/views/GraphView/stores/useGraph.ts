@@ -8,6 +8,9 @@ import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
 
+
+
+
 export interface Graph {
   viewPort: ViewPort | null;
   direction: CanvasDirection;
@@ -44,6 +47,7 @@ const initialStates: Graph = {
 
 interface GraphActions {
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
+  setNodeContent: (content: any) => void;
   setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
@@ -62,6 +66,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (nodeId: string, newText: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -74,6 +79,23 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  setNodeContent: (content: any) => {
+  const selectedNode = get().selectedNode;
+  if (!selectedNode) return;
+
+  const updatedNode = {
+    ...selectedNode,
+    text: content,
+  };
+
+  // Replace the node in the nodes array
+  const updatedNodes = get().nodes.map(node =>
+    node.id === selectedNode.id ? updatedNode : node
+  );
+
+  set({ selectedNode: updatedNode, nodes: updatedNodes });
+},
+
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
@@ -233,6 +255,21 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  updateNode: (nodeId, newText) => {
+    set(state => {
+      const updatedNodes = state.nodes.map(node =>
+        node.id === nodeId ? { ...node, text: newText } : node
+      );
+      return {
+        nodes: updatedNodes,
+        selectedNode: state.selectedNode?.id === nodeId
+          ? { ...state.selectedNode, text: newText }
+          : state.selectedNode,
+      };
+    });
+  },
+
 }));
 
 export default useGraph;
