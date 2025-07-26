@@ -43,6 +43,7 @@ const initialStates: Graph = {
 };
 
 interface GraphActions {
+  updateNodeText: (id: string, newText: string) => void;
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
   setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
@@ -233,6 +234,18 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  updateNodeText: (id, newText) => {
+  set(state => {
+    const updatedNodes = state.nodes.map(node =>
+      node.id === id ? { ...node, text: newText } : node
+    );
+    return { nodes: updatedNodes };
+  });
+},
+
+
 }));
 
 export default useGraph;
+
