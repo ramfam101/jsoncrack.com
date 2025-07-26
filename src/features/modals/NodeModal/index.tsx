@@ -24,13 +24,14 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const [originalText, setOriginalText] = React.useState(
     dataToString(selectedNode?.text)
   );
-  const nodeData = dataToString(selectedNode?.text);
+  const [nodeData, setNodeData] = React.useState(dataToString(selectedNode?.text));
   const path = selectedNode?.path || "";
 
   React.useEffect(() => {
     const textStr = dataToString(selectedNode?.text);
     setEditText(textStr);
     setOriginalText(textStr);
+    setNodeData(textStr);
     setEditMode(false);
   }, [selectedNode]);
 
@@ -87,6 +88,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                             json[key] = newValue;
                             setContents({ contents: JSON.stringify(json, null, 2) });
                             setEditText(editText);
+                            setNodeData(dataToString(newValue));
                             setOriginalText(editText);
                             setEditMode(false);
                             return;
@@ -95,6 +97,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                         // fallback: just update the whole JSON if path not found
                         setContents({ contents: editText });
                         setEditText(editText);
+                        setNodeData(editText);
                         setOriginalText(editText);
                         setEditMode(false);
                       } catch (e) {
