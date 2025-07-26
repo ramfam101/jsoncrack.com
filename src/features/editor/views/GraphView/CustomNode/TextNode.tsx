@@ -99,7 +99,17 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           $isParent={isParent}
         >
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
-            <TextRenderer>{value}</TextRenderer>
+            {typeof text === "object" && text !== null && !Array.isArray(text) ? (
+              <div>
+                {Object.entries(text).map(([key, val]) => (
+                  <div key={key}>
+                    <strong>{key}:</strong> {String(val)}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <TextRenderer>{value}</TextRenderer>
+            )}
           </Styled.StyledKey>
           {isParent && childrenCount > 0 && childrenCountVisible && (
             <Styled.StyledChildrenCount>{childrenCountText}</Styled.StyledChildrenCount>
