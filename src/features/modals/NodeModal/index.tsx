@@ -4,6 +4,7 @@ import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import { calculateNodeSize } from "../../editor/views/GraphView/lib/utils/calculateNodeSize";
+import useFile from "../../../store/useFile";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -13,8 +14,9 @@ const dataToString = (data: any) => {
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const selectedNode = useGraph(state => state.selectedNode);
   const nodes = useGraph(state => state.nodes);
-  const setSelectedNode = useGraph(state => state.setSelectedNode);
-  const setNodes = useGraph.setState;
+  // Use setContents from useFile to update JSON
+  const setContents = useFile(state => state.setContents);
+  const contents = useFile(state => state.contents);
   const [editMode, setEditMode] = React.useState(false);
   const [editText, setEditText] = React.useState(
     dataToString(selectedNode?.text)
@@ -72,28 +74,28 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                     onClick={() => {
                       if (!selectedNode) return;
                       try {
-                        let parsed = JSON.parse(editText);
-                        // Always store as array of key-value pairs for GraphView
-                        let toStore = parsed;
-                        if (Array.isArray(parsed) && parsed.every(item => Array.isArray(item) && item.length === 2)) {
-                          // Already array of pairs
-                          toStore = parsed;
-                        } else if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-                          // Convert object to array of pairs
-                          toStore = Object.entries(parsed);
+                        // Parse the current JSON from useFile
+                        const json = JSON.parse(contents);
+                        // Parse the edited value
+                        const newValue = JSON.parse(editText);
+                        // Find the node in the root JSON and update its value
+                        if (json && selectedNode.path) {
+                          // Extract the top-level key from the path, e.g. (Root).fruit -> fruit
+                          const match = selectedNode.path.match(/\{Root\}\.(\w+)/);
+                          if (match && match[1]) {
+                            const key = match[1];
+                            json[key] = newValue;
+                            setContents({ contents: JSON.stringify(json, null, 2) });
+                            setEditText(editText);
+                            setOriginalText(editText);
+                            setEditMode(false);
+                            return;
+                          }
                         }
-                        // Calculate new node size
-                        const size = calculateNodeSize(toStore, selectedNode?.data?.isParent);
-                        const updatedNodes = nodes.map(node =>
-                          node.id === selectedNode.id
-                            ? { ...node, text: toStore, width: size.width, height: size.height }
-                            : node
-                        );
-                        setNodes({ nodes: updatedNodes });
-                        setSelectedNode({ ...selectedNode, text: toStore, width: size.width, height: size.height });
-                        const pretty = dataToString(toStore);
-                        setEditText(pretty);
-                        setOriginalText(pretty);
+                        // fallback: just update the whole JSON if path not found
+                        setContents({ contents: editText });
+                        setEditText(editText);
+                        setOriginalText(editText);
                         setEditMode(false);
                       } catch (e) {
                         alert('Invalid JSON format. Please fix and try again.');
