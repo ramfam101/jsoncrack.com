@@ -39,7 +39,9 @@ export const JSONCrackLogo = ({ fontSize = "1.2rem", hideText, hideLogo, ...prop
   const [isIframe, setIsIframe] = React.useState(false);
 
   useEffect(() => {
-    setIsIframe(window !== undefined && window.location.href.includes("widget"));
+    if (typeof window !== "undefined") {
+      setIsIframe(window.location.href.includes("widget"));
+    }
   }, []);
 
   return (
