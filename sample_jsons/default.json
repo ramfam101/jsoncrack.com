@@ -1,0 +1,5 @@
+{
+  "fruit": { "name": "blueberries", "color": "blue", "weight": "120g" },
+  "car": { "model": "Model C", "year": 2023, "brand": "Chevy" },
+  "person": { "name": "Bob", "occupation": "doctor", "age": "31" }
+}

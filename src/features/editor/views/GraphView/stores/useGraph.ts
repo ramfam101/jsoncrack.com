@@ -236,23 +236,17 @@ export const useGraph = create<Graph & GraphActions>((set, get) => ({
   setViewPort: viewPort => set({ viewPort }),
   updateNode: (id, newText) =>
     set(state => {
-      // Update the graph nodes
       const updatedNodes = state.nodes.map(node =>
         node.id === id ? { ...node, text: newText } : node
       );
-      // Update the selected node
       const updatedSelectedNode =
-        state.selectedNode && state.selectedNode.id === id
+        state.selectedNode?.id === id
           ? { ...state.selectedNode, text: newText }
           : state.selectedNode;
-      // Update the main JSON data
-      useJson.getState().updateJsonByNodeId(id, newText);
 
-      return {
-        nodes: updatedNodes,
-        selectedNode: updatedSelectedNode,
-      };
+      return { nodes: updatedNodes, selectedNode: updatedSelectedNode };
     }),
+
 }));
 
 export default useGraph;

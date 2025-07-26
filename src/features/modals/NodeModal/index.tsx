@@ -1,85 +1,150 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, Button } from "@mantine/core";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import useJson from "../../../store/useJson";
-
+import useFile from "../../../store/useFile";
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const selectedNode = useGraph(state => state.selectedNode);
-  const updateNode = useGraph(state => state.updateNode);
+  const selectedNode = useGraph((s) => s.selectedNode);
+  const updateNode   = useGraph((s) => s.updateNode);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(selectedNode?.text ?? "");
+  const [rawInput,  setRawInput]  = useState("");
 
-  React.useEffect(() => {
-    setEditValue(selectedNode?.text ?? "");
+  // Helper: if someone passed an array-of-entries, turn it back into an object
+  const normalize = (val: any): any => {
+    if (
+      Array.isArray(val) &&
+      val.every(
+        (item) =>
+          Array.isArray(item) &&
+          item.length === 2 &&
+          typeof item[0] === "string"
+      )
+    ) {
+      return Object.fromEntries(val);
+    }
+    return val;
+  };
+
+  // Whenever the selectedNode changes, load its value into rawInput
+  useEffect(() => {
+    const v = normalize(selectedNode?.text);
+    setRawInput(
+      typeof v === "object"
+        ? JSON.stringify(v, null, 2)
+        : String(v ?? "")
+    );
     setIsEditing(false);
   }, [selectedNode]);
 
   const handleSave = () => {
-    if (selectedNode) {
-      updateNode(selectedNode.id, editValue);
-      useJson.getState().updateJsonByNodeId(selectedNode.id, editValue);
+    if (!selectedNode) return;
+
+    // 1) parse the user’s edits
+    let parsed: any;
+    try {
+      parsed = JSON.parse(rawInput);
+    } catch {
+      return alert("Invalid JSON. Please fix your syntax.");
     }
+
+    // 2) update the graph node (keeps it as object)
+    updateNode(selectedNode.id, parsed);
+
+    // 3) update the internal JSON tree
+    useJson.getState().updateJsonByNodeId(selectedNode.id, parsed);
+
+    // 4) push that new tree back into the left‑pane text editor
+    const updated = useJson.getState().getJson();
+    useFile.getState().setContents({
+      contents:  updated,
+      hasChanges: true,
+      skipUpdate: true,
+    });
+
+    // 5) close modal
     setIsEditing(false);
-    onClose(); // Optional: close modal after save
+    onClose();
   };
 
   const handleCancel = () => {
-    setEditValue(selectedNode?.text ?? "");
+    const v = normalize(selectedNode?.text);
+    setRawInput(
+      typeof v === "object"
+        ? JSON.stringify(v, null, 2)
+        : String(v ?? "")
+    );
     setIsEditing(false);
-    onClose(); // Optional: close modal after cancel
+    onClose();
   };
 
-  const isObject = typeof selectedNode?.text === "object" && selectedNode?.text !== null && !Array.isArray(selectedNode?.text);
+  // In view mode, pretty‑print any object/array, otherwise show raw string
+  const renderPreview = () => {
+    const txt = normalize(selectedNode?.text);
+    if (typeof txt === "object" && txt !== null) {
+      return JSON.stringify(txt, null, 2);
+    }
+    return String(txt ?? "");
+  };
 
   return (
-    <Modal opened={opened} onClose={onClose}>
-      <h2>Content</h2>
+    <Modal opened={opened} onClose={onClose} title="Node Content" centered>
+      <Text fw={600} mb="xs">Content</Text>
+
       {isEditing ? (
         <>
-          {isObject ? (
-            <Stack spacing="xs">
-              {Object.entries(editValue).map(([key, value]) => (
-                <div key={key}>
-                  <Text>{key}:</Text>
-                  <input
-                    style={{ marginLeft: "8px" }}
-                    value={value as string}
-                    onChange={e => setEditValue((prev: any) => ({
-                      ...prev,
-                      [key]: e.target.value,
-                    }))}
-                  />
-                </div>
-              ))}
-            </Stack>
-          ) : (
-            <input
-              value={editValue as string}
-              onChange={e => setEditValue(e.target.value)}
-            />
-          )}
+          <textarea
+            style={{
+              width: "100%",
+              height: 200,
+              fontFamily: "monospace",
+              backgroundColor: "#1a1a1a",
+              color: "white",
+              padding: 10,
+              borderRadius: 6,
+              border: "1px solid #444",
+            }}
+            value={rawInput}
+            onChange={(e) => setRawInput(e.target.value)}
+          />
+
           <Stack mt="md" spacing="xs" direction="row">
-            <Button onClick={handleSave}>Save</Button>
+            <Button color="green" onClick={handleSave}>Save</Button>
             <Button variant="default" onClick={handleCancel}>Cancel</Button>
           </Stack>
         </>
       ) : (
         <>
-          <div>
-            {isObject
-              ? Object.entries(selectedNode?.text ?? {}).map(([key, value]) => (
-                  <div key={key}>
-                    <strong>{key}:</strong> {String(value)}
-                  </div>
-                ))
-              : selectedNode?.text}
-          </div>
+          <pre
+            style={{
+              whiteSpace:  "pre-wrap",
+              fontFamily: "monospace",
+              background: "#1a1a1a",
+              color:      "white",
+              padding:    12,
+              borderRadius: 8,
+            }}
+          >
+            {renderPreview()}
+          </pre>
           <Button mt="md" onClick={() => setIsEditing(true)}>Edit</Button>
         </>
       )}
+
+      <Text mt="xl" size="sm" color="dimmed">JSON Path</Text>
+      <pre
+        style={{
+          background: "#1a1a1a",
+          color:      "white",
+          padding:    8,
+          borderRadius: 6,
+          fontFamily: "monospace",
+        }}
+      >
+        {selectedNode?.path ?? "{Root}"}
+      </pre>
     </Modal>
   );
 };
