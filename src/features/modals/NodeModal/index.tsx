@@ -4,14 +4,10 @@ import { Modal, Stack, Text, ScrollArea, Button, Group, Textarea } from "@mantin
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
+// Always pretty-print with quotes and indentation
 const dataToString = (data: any) => {
-  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
-  const replacer = (_: string, v: string) => {
-    if (typeof v === "string") return v.replaceAll('"', "");
-    return v;
-  };
-
-  return JSON.stringify(text, replacer, 2);
+  if (!data) return "";
+  return JSON.stringify(data, null, 2);
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
@@ -43,7 +39,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
-          <Group justify="space-between" align="center"> {/*  */}
+          <Group justify="space-between" align="center">
             <Text fz="xs" fw={500}>
               Content
             </Text>
@@ -58,7 +54,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                 <Button size="xs" color="gray" onClick={() => setIsEditing(false)}>Cancel</Button> 
               </Group> 
             )} 
-          </Group> {/*  */}
+          </Group>
           <ScrollArea.Autosize mah={250} maw={600}>
             {!isEditing ? ( 
               <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
