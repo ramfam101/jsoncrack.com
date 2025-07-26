@@ -3,6 +3,7 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import { calculateNodeSize } from "../../editor/views/GraphView/lib/utils/calculateNodeSize";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -81,11 +82,15 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
                           // Convert object to array of pairs
                           toStore = Object.entries(parsed);
                         }
+                        // Calculate new node size
+                        const size = calculateNodeSize(toStore, selectedNode?.data?.isParent);
                         const updatedNodes = nodes.map(node =>
-                          node.id === selectedNode.id ? { ...node, text: toStore } : node
+                          node.id === selectedNode.id
+                            ? { ...node, text: toStore, width: size.width, height: size.height }
+                            : node
                         );
                         setNodes({ nodes: updatedNodes });
-                        setSelectedNode({ ...selectedNode, text: toStore });
+                        setSelectedNode({ ...selectedNode, text: toStore, width: size.width, height: size.height });
                         const pretty = dataToString(toStore);
                         setEditText(pretty);
                         setOriginalText(pretty);
