@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (text: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +234,20 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateSelectedNodeText: text => set(state => {
+    if (!state.selectedNode) return {};
+    const updatedNode = { 
+      ...state.selectedNode, 
+      text,
+      data: { ...state.selectedNode.data, text },
+     };
+    return {
+      selectedNode: updatedNode,
+      nodes: state.nodes.map(node =>
+        node.id == updatedNode.id ? updatedNode : node
+      ),
+    };
+  }),
 }));
 
 export default useGraph;
