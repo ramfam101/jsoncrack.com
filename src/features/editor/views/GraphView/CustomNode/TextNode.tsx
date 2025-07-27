@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
 import styled from "styled-components";
-import { MdLink, MdLinkOff } from "react-icons/md";
+import { MdLink, MdLinkOff, MdEdit } from "react-icons/md";
 import type { CustomNodeProps } from ".";
 import useToggleHide from "../../../../../hooks/useToggleHide";
 import useConfig from "../../../../../store/useConfig";
+import { useModal } from "../../../../../store/useModal";
 import { isContentImage } from "../lib/utils/calculateNodeSize";
 import useGraph from "../stores/useGraph";
 import { TextRenderer } from "./TextRenderer";
@@ -25,7 +26,30 @@ const StyledExpand = styled.button`
   }
 `;
 
-const StyledTextNodeWrapper = styled.span<{ $hasCollapse: boolean; $isParent: boolean }>`
+const StyledEditButton = styled.button`
+  pointer-events: all;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.TEXT_NORMAL};
+  background: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 32px;
+  border-left: 1px solid ${({ theme }) => theme.BACKGROUND_MODIFIER_ACCENT};
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0 0);
+    color: ${({ theme }) => theme.TEXT_POSITIVE};
+  }
+`;
+
+const StyledTextNodeWrapper = styled.span<{
+  $hasCollapse: boolean;
+  $isParent: boolean;
+  $hasEdit?: boolean;
+}>`
   display: flex;
   justify-content: ${({ $hasCollapse, $isParent }) =>
     $hasCollapse ? "space-between" : $isParent ? "center" : "flex-start"};
@@ -33,7 +57,7 @@ const StyledTextNodeWrapper = styled.span<{ $hasCollapse: boolean; $isParent: bo
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${({ $hasCollapse }) => ($hasCollapse ? "0" : "0 10px")};
+  padding: ${({ $hasCollapse, $hasEdit }) => ($hasCollapse || $hasEdit ? "0" : "0 10px")};
 `;
 
 const StyledImageWrapper = styled.div`
@@ -60,7 +84,9 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   const imagePreviewEnabled = useConfig(state => state.imagePreviewEnabled);
   const expandNodes = useGraph(state => state.expandNodes);
   const collapseNodes = useGraph(state => state.collapseNodes);
+  const setSelectedNode = useGraph(state => state.setSelectedNode);
   const isExpanded = useGraph(state => state.collapsedParents.includes(id));
+  const setVisible = useModal(state => state.setVisible);
   const isImage = imagePreviewEnabled && isContentImage(text as string);
   const value = JSON.stringify(text).replaceAll('"', "");
 
@@ -71,6 +97,15 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
     else expandNodes(id);
     validateHiddenNodes();
   };
+
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setSelectedNode(node);
+    setVisible("NodeModal", true);
+  };
+
+  // Only show edit button for non-parent nodes (leaf nodes)
+  const showEditButton = !isParent;
 
   const childrenCountText = useMemo(() => {
     if (type === "object") return `{${childrenCount}}`;
@@ -97,12 +132,18 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           data-key={JSON.stringify(text)}
           $hasCollapse={isParent && collapseButtonVisible}
           $isParent={isParent}
+          $hasEdit={showEditButton}
         >
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
             <TextRenderer>{value}</TextRenderer>
           </Styled.StyledKey>
           {isParent && childrenCount > 0 && childrenCountVisible && (
             <Styled.StyledChildrenCount>{childrenCountText}</Styled.StyledChildrenCount>
+          )}
+          {showEditButton && (
+            <StyledEditButton aria-label="Edit" onClick={handleEdit}>
+              <MdEdit size={16} />
+            </StyledEditButton>
           )}
           {isParent && hasCollapse && collapseButtonVisible && (
             <StyledExpand aria-label="Expand" onClick={handleExpand}>
