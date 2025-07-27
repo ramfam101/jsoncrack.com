@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (newText: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -74,40 +75,64 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateSelectedNodeText: (newText) => set(state => {
+  // Always convert array of entries to object
+  const safeObj = Array.isArray(newText) && newText.every(
+    entry => Array.isArray(entry) && entry.length === 2 && typeof entry[0] === "string"
+  )
+    ? Object.fromEntries(newText)
+    : newText;
+
+  const { selectedNode } = state;
+  if (!selectedNode) return {};
+  const updatedNodes = state.nodes.map(node =>
+    node.id === selectedNode.id
+      ? { ...node, text: safeObj }
+      : node
+  );
+  return {
+    selectedNode: { ...selectedNode, text: safeObj },
+    nodes: updatedNodes,
+  };
+}),
   setGraph: (data, options) => {
-    const { nodes, edges } = parser(data ?? useJson.getState().json);
+  const { nodes, edges } = parser(
+    typeof data === "string"
+      ? data
+      : JSON.stringify(useJson.getState().json)
+  );
 
-    if (get().collapseAll) {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({ aboveSupportedLimit: true, ...options, loading: false });
-      }
+  if (get().collapseAll) {
+    if (nodes.length > SUPPORTED_LIMIT) {
+      return set({ aboveSupportedLimit: true, ...options, loading: false });
+    }
 
-      set({ nodes, edges, aboveSupportedLimit: false, ...options });
-      get().collapseGraph();
-    } else {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({
-          aboveSupportedLimit: true,
-          collapsedParents: [],
-          collapsedNodes: [],
-          collapsedEdges: [],
-          ...options,
-          loading: false,
-        });
-      }
-
-      set({
-        nodes,
-        edges,
+    set({ nodes, edges, aboveSupportedLimit: false, ...options });
+    get().collapseGraph();
+  } else {
+    if (nodes.length > SUPPORTED_LIMIT) {
+      return set({
+        aboveSupportedLimit: true,
         collapsedParents: [],
         collapsedNodes: [],
         collapsedEdges: [],
-        graphCollapsed: false,
-        aboveSupportedLimit: false,
         ...options,
+        loading: false,
       });
     }
-  },
+
+    set({
+      nodes,
+      edges,
+      collapsedParents: [],
+      collapsedNodes: [],
+      collapsedEdges: [],
+      graphCollapsed: false,
+      aboveSupportedLimit: false,
+      ...options,
+    });
+  }
+},
   setDirection: (direction = "RIGHT") => {
     set({ direction });
     setTimeout(() => get().centerView(), 200);
@@ -178,7 +203,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       .map(node => node.id);
 
     const closestParentToRoot = Math.min(...collapsedParents.map(n => +n));
-    const focusNodeId = `g[id*='node-${closestParentToRoot}']`;
+    const focusNodeId = g[id*='node-${closestParentToRoot}'];
     const rootNode = document.querySelector(focusNodeId);
 
     set({
