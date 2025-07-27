@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (newText: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +234,26 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  updateSelectedNodeText: (newText: string) => {
+    set(state => {
+      if (!state.selectedNode) return {};
+      let parsedText;
+      try {
+        parsedText = JSON.parse(newText);
+      } catch (e) {
+        console.error("Invalid JSON:", e);
+        return {};
+      }
+      return {
+        selectedNode: {
+          ...state.selectedNode,
+          text: parsedText,
+        },
+      };
+    });
+  },
+
 }));
 
 export default useGraph;
