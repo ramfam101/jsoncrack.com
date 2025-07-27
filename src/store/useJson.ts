@@ -9,6 +9,7 @@ interface JsonActions {
 
 const initialStates = {
   json: "{}",
+  json_version: 0,
   loading: true,
 };
 
@@ -18,7 +19,11 @@ const useJson = create<JsonStates & JsonActions>()((set, get) => ({
   ...initialStates,
   getJson: () => get().json,
   setJson: json => {
-    set({ json, loading: false });
+    set(state => ({
+      json,
+      json_version: state.json_version + 1,
+      loading: false,
+    }));
     useGraph.getState().setGraph(json);
   },
   clear: () => {
