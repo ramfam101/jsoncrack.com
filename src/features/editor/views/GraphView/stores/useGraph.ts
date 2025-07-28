@@ -62,7 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
-  updateNode: (id: string, newValue: any) => void; // <-- Add this to the interface
+  updateNode: (id: string, newValue: any) => void; 
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -235,7 +235,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
 
-  // ADD THIS FUNCTION TO ENABLE NODE UPDATES
+  
   updateNode: (id: string, newValue: any) => {
     set(state => ({
       nodes: state.nodes.map(node =>

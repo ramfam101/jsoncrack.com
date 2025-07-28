@@ -4,7 +4,7 @@ import { NODE_DIMENSIONS } from "../../../../../constants/graph";
 import { TextRenderer } from "./TextRenderer";
 import * as Styled from "./styles";
 
-// Allow any value type, not just string
+
 type Value = [string, any];
 
 type RowProps = {
