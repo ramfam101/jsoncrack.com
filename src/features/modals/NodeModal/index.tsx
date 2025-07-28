@@ -3,6 +3,7 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -17,6 +18,9 @@ const dataToString = (data: any) => {
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
+  
+  const contents = useFile(state => state.contents);
+  const setContents = useFile(state => state.setContents);
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -25,16 +29,46 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
           <Text fz="xs" fw={500}>
             Content
           </Text>
+          <button
+            id="edit"
+            onClick={() => {
+              document.getElementById("code")?.setAttribute("contentEditable", "true");
+              document.getElementById("save")?.removeAttribute("hidden");
+              document.getElementById("cancel")?.removeAttribute("hidden");
+              document.getElementById("edit")?.setAttribute("hidden", "true");
+            }}
+          >
+            edit
+          </button>
+          <button id="save" hidden onClick={() => {
+              document.getElementById("code")?.setAttribute("contentEditable", "false");
+              document.getElementById("save")?.setAttribute("hidden", "true");
+              document.getElementById("cancel")?.setAttribute("hidden", "true");
+              document.getElementById("edit")?.removeAttribute("hidden");
+
+              const codeElement = document.getElementById("code");
+              const updatedContent = codeElement?.textContent || "";
+              setContents({ contents: updatedContent, skipUpdate: true });
+
+            }}>save</button>
+          <button id="cancel" hidden onClick={() => {
+              document.getElementById("code")?.setAttribute("contentEditable", "false");
+              document.getElementById("save")?.setAttribute("hidden", "true");
+              document.getElementById("cancel")?.setAttribute("hidden", "true");
+              document.getElementById("edit")?.removeAttribute("hidden");
+              document.getElementById("code")?.setAttribute("code", path);
+            }}>cancel</button>
           <ScrollArea.Autosize mah={250} maw={600}>
-            <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+            <CodeHighlight id="code" code={nodeData} miw={350} maw={600} language="json" withCopyButton/>
           </ScrollArea.Autosize>
         </Stack>
         <Text fz="xs" fw={500}>
           JSON Path
         </Text>
         <ScrollArea.Autosize maw={600}>
-          <CodeHighlight
+          <CodeHighlight id="code"
             code={path}
+            
             miw={350}
             mah={250}
             language="json"
@@ -45,5 +79,6 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
         </ScrollArea.Autosize>
       </Stack>
     </Modal>
+    
   );
 };
