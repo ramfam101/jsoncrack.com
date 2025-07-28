@@ -58,13 +58,27 @@ export const useNodeEdit = (initialValue: string): UseNodeEditReturns => {
             // Update the graph store state first
             const updatedNodes = nodes.map(node => {
                 if (node.id === selectedNode.id) {
-                    return {
-                        ...node,
-                        text: [{
-                            ...node.text[0],
-                            value: newValue
-                        }]
-                    };
+                    // If the new value is an object, we need to reconstruct the text structure
+                    if (typeof newValue === 'object' && newValue !== null) {
+                        const newText = Object.entries(newValue).map(([key, value]) => ({
+                            key,
+                            value: String(value),
+                            type: typeof value
+                        }));
+                        return {
+                            ...node,
+                            text: newText
+                        };
+                    } else {
+                        // For primitive values, just update the first text element
+                        return {
+                            ...node,
+                            text: [{
+                                ...node.text[0],
+                                value: String(newValue)
+                            }]
+                        };
+                    }
                 }
                 return node;
             });
@@ -84,7 +98,12 @@ export const useNodeEdit = (initialValue: string): UseNodeEditReturns => {
 
             // Finally update local state
             setIsEditing(false);
-            setEditValue(JSON.stringify(newValue, null, 2));
+            // Update the editValue to reflect the new normalized data
+            if (typeof newValue === 'object' && newValue !== null) {
+                setEditValue(JSON.stringify(newValue, null, 2));
+            } else {
+                setEditValue(String(newValue));
+            }
         } catch (error) {
             console.error('Failed to update node:', error);
             // You might want to show an error toast here
