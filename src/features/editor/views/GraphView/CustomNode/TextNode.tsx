@@ -62,7 +62,13 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   const collapseNodes = useGraph(state => state.collapseNodes);
   const isExpanded = useGraph(state => state.collapsedParents.includes(id));
   const isImage = imagePreviewEnabled && isContentImage(text as string);
-  const value = JSON.stringify(text).replaceAll('"', "");
+
+  // Updated value logic for better object preview
+  const value =
+  typeof text === "object" && text !== null
+    // full JSON with quotes, or truncate if you want:
+    ? JSON.stringify(text)
+    : String(text);
 
   const handleExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
