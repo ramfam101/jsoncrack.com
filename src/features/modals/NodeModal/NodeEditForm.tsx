@@ -1,34 +1,31 @@
 import React from "react";
 import { Button, Group } from "@mantine/core";
+import type { NodeEditFormProps } from "./types";
 
-export const NodeEditForm = () => {
-  const [isEditing, setIsEditing] = React.useState(false);
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelClick = () => {
-    setIsEditing(false);
-  };
-
+export const NodeEditForm: React.FC<NodeEditFormProps> = ({
+  isEditing,
+  onEdit,
+  onCancel,
+  onSave,
+}) => {
   return (
-    <>
+    <Group gap="xs">
       {!isEditing ? (
         <Button
           size="xs"
           variant="light"
           color="blue"
-          onClick={handleEditClick}
+          onClick={onEdit}
         >
           Edit
         </Button>
       ) : (
-        <Group gap="xs">
+        <>
           <Button
             size="xs"
             variant="light"
             color="green"
+            onClick={onSave}
           >
             Save
           </Button>
@@ -36,12 +33,12 @@ export const NodeEditForm = () => {
             size="xs"
             variant="light"
             color="gray"
-            onClick={handleCancelClick}
+            onClick={onCancel}
           >
             Cancel
           </Button>
-        </Group>
+        </>
       )}
-    </>
+    </Group>
   );
 };
