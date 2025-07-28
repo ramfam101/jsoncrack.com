@@ -70,10 +70,16 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             {isEditing ? (
               <Group>
                 <Button size="xs" color="green" onClick={handleSave}>Save</Button>
-                <Button size="xs" variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button size="xs" variant="outline" onClick={() => {
+                  setEditValue(nodeData); // Reset to original node data
+                  setIsEditing(false);    // Exit editing mode
+                }}>
+                  Cancel
+                </Button>
+
               </Group>
             ) : (
-              <Button size="xs" variant="outline" onClick={() => setIsEditing(true)}>
+              <Button size="xs" variant="outline" onClick={() => setIsEditing(node.text)}>
                 Edit
               </Button>
             )}
