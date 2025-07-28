@@ -12,6 +12,7 @@ import {
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import useJson from "../../../store/useJson";
+import useFile from "../../../store/useFile";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -41,22 +42,36 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   /* helper: update json string at path -------------------------------- */
   const updateJsonAtPath = React.useCallback(
     (jsonStr: string, jsonPath: string, newValue: any) => {
-      // remove leading "{Root}." or "{Root}"
+      // Strip the “{Root}” prefix
       const cleaned = jsonPath.replace(/^\{Root\}\.?/, "");
+
+      // Turn the path into an array of segments (handles dots and [index] syntax)
       const segments: (string | number)[] = [];
-      const re = /([^.\\[\\]]+)|\\[(\\d+)\\]/g;
-      let m: RegExpExecArray | null;
-      while ((m = re.exec(cleaned))) {
-        segments.push(m[1] ?? Number(m[2]));
+      if (cleaned.length) {
+        cleaned.split(".").forEach(part => {
+          const regex = /([^\[\]]+)|\[(\d+)\]/g;
+          let match: RegExpExecArray | null;
+          while ((match = regex.exec(part))) {
+            segments.push(match[1] ?? Number(match[2]));
+          }
+        });
       }
 
       const srcObj = JSON.parse(jsonStr);
+
+      // If we’re editing the root itself, just stringify the new value
+      if (segments.length === 0) {
+        return JSON.stringify(newValue, null, 2);
+      }
+
+      // Walk / build intermediate objects & arrays as needed
       let cur: any = srcObj;
       for (let i = 0; i < segments.length - 1; i++) {
         const key = segments[i];
         if (!(key in cur)) cur[key] = typeof segments[i + 1] === "number" ? [] : {};
         cur = cur[key];
       }
+
       cur[segments[segments.length - 1]] = newValue;
       return JSON.stringify(srcObj, null, 2);
     },
@@ -67,8 +82,16 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     try {
       const parsed = JSON.parse(editedText);
       const jsonStore = useJson.getState();
+
+      // Update the master JSON string
       const freshJson = updateJsonAtPath(jsonStore.getJson(), path, parsed);
       jsonStore.setJson(freshJson); // triggers graph re-render
+
+      // ---- keep Monaco editor (left panel) up-to-date -----------------
+      useFile
+        .getState()
+        .setContents({ contents: freshJson, hasChanges: true, skipUpdate: true });
+      // -----------------------------------------------------------------
 
       setIsEditing(false);
       onClose?.(); // close modal
