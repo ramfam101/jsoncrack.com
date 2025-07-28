@@ -35,8 +35,8 @@ interface TextRendererProps {
 }
 
 export const TextRenderer = ({ children }: TextRendererProps) => {
-  const text = children?.replaceAll('"', "");
-
+  const text = String(children ?? ""); // <-- Ensure it's a string
+  console.log("TextRenderer render", text);
   if (isURL(text)) return Linkify(text);
 
   if (isColorFormat(text)) {
@@ -47,7 +47,7 @@ export const TextRenderer = ({ children }: TextRendererProps) => {
       </StyledRow>
     );
   }
-  return <>{children}</>;
+  return <>{text}</>; // <-- Use text here
 };
 
 function isColorFormat(colorString: string) {

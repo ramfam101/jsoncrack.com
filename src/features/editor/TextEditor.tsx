@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
 import useConfig from "../../store/useConfig";
 import useFile from "../../store/useFile";
+import useJson from "../../store/useJson"; // <-- Add this line at the top
 
 loader.config({
   paths: {
@@ -30,6 +31,7 @@ const TextEditor = () => {
   const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
+  const json = useJson(state => state.json); // <-- Add this line
 
   React.useEffect(() => {
     monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -48,6 +50,10 @@ const TextEditor = () => {
     });
   }, [jsonSchema, monaco?.languages.json.jsonDefaults]);
 
+      React.useEffect(() => {
+    setContents({ contents: json, skipUpdate: true });
+  }, [json, setContents]);
+  
   React.useEffect(() => {
     const beforeunload = (e: BeforeUnloadEvent) => {
       if (getHasChanges()) {

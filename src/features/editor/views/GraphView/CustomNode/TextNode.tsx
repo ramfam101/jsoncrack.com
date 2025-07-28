@@ -47,6 +47,7 @@ const StyledImage = styled.img`
 `;
 
 const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
+  console.log("TextNode render", node);
   const {
     id,
     text,
@@ -123,4 +124,4 @@ function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
   );
 }
 
-export const TextNode = React.memo(Node, propsAreEqual);
+export const TextNode = Node;
