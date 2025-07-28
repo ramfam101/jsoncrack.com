@@ -1,49 +1,135 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
-import { CodeHighlight } from "@mantine/code-highlight";
+import { Modal, Text, Button } from "@mantine/core";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
-
-const dataToString = (data: any) => {
-  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
-  const replacer = (_: string, v: string) => {
-    if (typeof v === "string") return v.replaceAll('"', "");
-    return v;
-  };
-
-  return JSON.stringify(text, replacer, 2);
-};
+import useJson from "../../../store/useJson";
+import useFile from "../../../store/useFile";
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
-  const path = useGraph(state => state.selectedNode?.path || "");
+  const selectedNode = useGraph(s => s.selectedNode);
+  const updateNode = useGraph(s => s.updateNode);
+  const [isEditing, setIsEditing] = useState(false);
+  const [rawInput, setRawInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const value = selectedNode?.text;
+    setRawInput(
+      typeof value === "object"
+        ? JSON.stringify(value, null, 2)
+        : String(value ?? "")
+    );
+    setIsEditing(false);
+  }, [selectedNode]);
+
+  const handleSave = () => {
+    if (!selectedNode) return;
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(rawInput);
+
+      // Auto-convert [["key", "value"]] → { key: value }
+      if (Array.isArray(parsed) && parsed.every(p => Array.isArray(p) && p.length === 2)) {
+        parsed = Object.fromEntries(parsed);
+      }
+
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+        alert("Please enter a valid JSON object like { \"key\": \"value\" }.");
+        return;
+      }
+
+    } catch {
+      alert("Invalid JSON. Please fix your syntax.");
+      return;
+    }
+
+    // Update graph state
+    updateNode(selectedNode.id, parsed);
+    useJson.getState().updateJsonByNodeId(selectedNode.id, parsed);
+
+    // Push to left-hand editor
+    const updated = useJson.getState().getJson();
+    useFile.getState().setContents({
+      contents: updated,
+      hasChanges: true,
+      skipUpdate: true,
+    });
+
+    setIsEditing(false);
+    onClose();
+  };
+
+  const handleCancel = () => {
+    const value = selectedNode?.text;
+    setRawInput(
+      typeof value === "object"
+        ? JSON.stringify(value, null, 2)
+        : String(value ?? "")
+    );
+    setIsEditing(false);
+    onClose();
+  };
 
   return (
-    <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
-      <Stack py="sm" gap="sm">
-        <Stack gap="xs">
-          <Text fz="xs" fw={500}>
-            Content
-          </Text>
-          <ScrollArea.Autosize mah={250} maw={600}>
-            <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
-          </ScrollArea.Autosize>
-        </Stack>
-        <Text fz="xs" fw={500}>
-          JSON Path
-        </Text>
-        <ScrollArea.Autosize maw={600}>
-          <CodeHighlight
-            code={path}
-            miw={350}
-            mah={250}
-            language="json"
-            copyLabel="Copy to clipboard"
-            copiedLabel="Copied to clipboard"
-            withCopyButton
+    <Modal opened={opened} onClose={onClose} title="Node Content" centered>
+      <Text fw={600} mb="xs">Content</Text>
+
+      {isEditing ? (
+        <>
+          <textarea
+            style={{
+              width: "100%",
+              height: "200px",
+              fontFamily: "monospace",
+              backgroundColor: "#1a1a1a",
+              color: "white",
+              padding: "10px",
+              borderRadius: "6px",
+              border: "1px solid #444",
+            }}
+            value={rawInput}
+            onChange={(e) => setRawInput(e.target.value)}
           />
-        </ScrollArea.Autosize>
-      </Stack>
+
+          <div style={{ display: "flex", gap: "8px", marginTop: "1rem" }}>
+            <Button color="green" onClick={handleSave} loading={isSaving}>Save</Button>
+            <Button variant="default" onClick={handleCancel}>Cancel</Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <pre style={{
+            whiteSpace: "pre-wrap",
+            fontFamily: "monospace",
+            background: "#1a1a1a",
+            color: "white",
+            padding: "12px",
+            borderRadius: "8px",
+          }}>
+            {(() => {
+              const txt = selectedNode?.text;
+              try {
+                return JSON.stringify(JSON.parse(String(txt)), null, 2);
+              } catch {
+                return String(txt ?? "");
+              }
+            })()}
+          </pre>
+          <Button mt="md" onClick={() => setIsEditing(true)}>Edit</Button>
+        </>
+      )}
+
+      <Text mt="xl" size="sm" color="dimmed">JSON Path</Text>
+      <pre style={{
+        background: "#1a1a1a",
+        color: "white",
+        padding: "8px",
+        borderRadius: "6px",
+        fontFamily: "monospace",
+      }}>
+        {selectedNode?.path ?? "{Root}"}
+      </pre>
     </Modal>
   );
 };
