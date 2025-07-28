@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\features",
+    "\\features\\editor",
+    "\\features\\editor\\views",
+    "\\features\\editor\\views\\GraphView",
+    "\\features\\editor\\views\\GraphView\\CustomNode",
+    "\\features\\editor\\views\\GraphView\\stores",
+    "\\features\\modals",
+    "\\features\\modals\\NodeModal",
+    "\\store"
+  ],
+  "SelectedNode": "\\features\\editor\\views\\GraphView\\CustomNode\\index.tsx",
+  "PreviewInSolutionExplorer": false
+}
