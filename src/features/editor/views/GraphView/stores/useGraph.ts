@@ -238,9 +238,12 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     set({
       nodes: get().nodes.map(node =>
         node.id === nodeId
-          ? { ...node, data: { ...node.data, value: newValue } }
+          ? { ...node, data: { ...node.data, value: newValue }, text: newValue }
           : node
       ),
+      selectedNode: get().selectedNode && get().selectedNode.id === nodeId
+        ? { ...get().selectedNode, data: { ...get().selectedNode.data, value: newValue }, text: newValue }
+        : get().selectedNode
     });
   },
 }));

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import styled from "styled-components";
 import { MdLink, MdLinkOff } from "react-icons/md";
 import type { CustomNodeProps } from ".";
@@ -8,7 +8,6 @@ import { isContentImage } from "../lib/utils/calculateNodeSize";
 import useGraph from "../stores/useGraph";
 import { TextRenderer } from "./TextRenderer";
 import * as Styled from "./styles";
-import { shallow } from "zustand/shallow";
 
 const StyledExpand = styled.button`
   pointer-events: all;
@@ -28,7 +27,8 @@ const StyledExpand = styled.button`
 
 const StyledTextNodeWrapper = styled.span<{ $hasCollapse: boolean; $isParent: boolean }>`
   display: flex;
-  justify-content: flex-start; // <-- Always align items to the left
+  justify-content: ${({ $hasCollapse, $isParent }) =>
+    $hasCollapse ? "space-between" : $isParent ? "center" : "flex-start"};
   align-items: center;
   height: 100%;
   width: 100%;
@@ -47,11 +47,6 @@ const StyledImage = styled.img`
 `;
 
 const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
-  const updateNodeValue = useGraph(state => state.updateNodeValue);
-  const selectedNode = useGraph(state => state.selectedNode, shallow);
-  const setSelectedNode = useGraph(state => state.setSelectedNode);
-  const [editing, setEditing] = useState(false);
-  const [editValue, setEditValue] = useState(node.text);
   const {
     id,
     text,
@@ -69,35 +64,14 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   const isImage = imagePreviewEnabled && isContentImage(text as string);
   const value = JSON.stringify(text).replaceAll('"', "");
 
-  // Check if this node is selected
-  const isSelected = selectedNode?.id === id;
-
   const handleExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    
-    // Check if needs to be removed
+
     if (!isExpanded) collapseNodes(id);
     else expandNodes(id);
     validateHiddenNodes();
   };
 
-  // Handle edit button click
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setEditing(true); };
-
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    updateNodeValue(id, editValue);
-    setEditing(false);
-  };
-
-  // User input for editing
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditValue(e.target.value);
-  };
-
-  
   const childrenCountText = useMemo(() => {
     if (type === "object") return `{${childrenCount}}`;
     if (type === "array") return `[${childrenCount}]`;
@@ -123,95 +97,9 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           data-key={JSON.stringify(text)}
           $hasCollapse={isParent && collapseButtonVisible}
           $isParent={isParent}
-          onClick={e => {
-            e.stopPropagation();
-            setSelectedNode(node);
-          }}
         >
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
-            {/* Content and path */}
-            <span style={{ display: "flex", alignItems: "center", minWidth: 0, flex: 1, overflow: "hidden" }}>
-              <TextRenderer>{value}</TextRenderer>
-              {node.path && (
-                <span
-                  style={{
-                    color: "#888",
-                    fontSize: 11,
-                    marginLeft: 8,
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    maxWidth: 120,
-                  }}
-                  title={node.path}
-                >
-                  {node.path}
-                </span>
-              )}
-            </span>
-            {/* Edit button or editing controls */}
-            {isSelected && !editing && (
-              <button
-                onClick={handleEdit}
-                style={{
-                  marginLeft: 12,
-                  fontSize: 12,
-                  padding: "2px 12px",
-                  cursor: "pointer",
-                  borderRadius: 3,
-                  border: "1px solid #27ae60",
-                  background: "#27ae60",
-                  color: "#fff",
-                  fontWeight: 600,
-                  flexShrink: 0,
-                  transition: "background 0.2s",
-                }}
-              >
-                Edit
-              </button>
-            )}
-            {isSelected && editing && (
-              <>
-                <input
-                  type="text"
-                  value={editValue}
-                  onChange={handleInputChange}
-                  style={{ width: "80px", marginLeft: 12 }}
-                  autoFocus
-                  onClick={e => e.stopPropagation()}
-                  onKeyDown={e => {
-                    if (e.key === "Enter") handleSave(e as any);
-                  }}
-                />
-                <button
-                  onClick={handleSave}
-                  style={{
-                    marginLeft: 4,
-                    background: "#27ae60",
-                    color: "#fff",
-                    border: "1px solid #27ae60",
-                    borderRadius: 3,
-                    padding: "2px 10px",
-                    fontWeight: 600,
-                  }}
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditing(false)}
-                  style={{
-                    marginLeft: 4,
-                    background: "#fff",
-                    color: "#888",
-                    border: "1px solid #ccc",
-                    borderRadius: 3,
-                    padding: "2px 10px",
-                  }}
-                >
-                  Cancel
-                </button>
-              </>
-            )}
+            <TextRenderer>{value}</TextRenderer>
           </Styled.StyledKey>
           {isParent && childrenCount > 0 && childrenCountVisible && (
             <Styled.StyledChildrenCount>{childrenCountText}</Styled.StyledChildrenCount>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { InferGetStaticPropsType, GetStaticProps } from "next";
 import { NextSeo } from "next-seo";
 import { SEO } from "../constants/seo";
@@ -12,6 +12,9 @@ import { Section3 } from "../layout/Landing/Section3";
 import Layout from "../layout/PageLayout";
 
 export const HomePage = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+  // All hooks and logic go here, inside the component
+  const [editValue, setEditValue] = useState("");
+
   return (
     <Layout>
       <NextSeo {...SEO} canonical="https://jsoncrack.com" />
