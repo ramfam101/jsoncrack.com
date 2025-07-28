@@ -63,6 +63,15 @@ interface GraphActions {
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
 }
+function updateJsonAtPath(json: any, path: string, value: any) {
+  const keys = path.split(".");
+  let obj = json;
+  for (let i = 0; i < keys.length - 1; i++) {
+    obj = obj[keys[i]];
+  }
+  obj[keys[keys.length - 1]] = value;
+  return json;
+}
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
@@ -70,10 +79,26 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     set({ collapseAll });
     get().collapseGraph();
   },
+  
   clearGraph: () => set({ nodes: [], edges: [], loading: false }),
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+updateNodeText: (id: string, newText: string) => {
+  set(state => {
+    const nodes = state.nodes.map(node =>
+      node.id === id ? { ...node, text: newText } : node
+    );
+    const selectedNode =
+      state.selectedNode && state.selectedNode.id === id
+        ? { ...state.selectedNode, text: newText }
+        : state.selectedNode;
+
+    return { nodes, selectedNode };
+  });
+},
+  
+
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
@@ -233,6 +258,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  
 }));
 
 export default useGraph;
