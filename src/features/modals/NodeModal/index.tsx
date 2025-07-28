@@ -91,6 +91,71 @@ function updateJsonAtPath(obj, path, newValue) {
   current[path[path.length - 1]] = newValue;
 }
 
+function reconstructJson(nodes, edges) {
+  const nodeMap = {};
+  nodes.forEach(node => { nodeMap[node.id] = node; });
+
+  const childrenMap = {};
+  edges.forEach(edge => {
+    if (!childrenMap[edge.from]) childrenMap[edge.from] = [];
+    childrenMap[edge.from].push(nodeMap[edge.to]);
+  });
+
+  const childIds = new Set(edges.map(e => e.to));
+  const root = nodes.find(n => !childIds.has(n.id));
+  if (!root) return {};
+
+  function build(node) {
+    const hasChildren = childrenMap[node.id] && childrenMap[node.id].length > 0;
+    const isObjectNode = Array.isArray(node.text);
+
+    // Case: leaf-like object node (e.g. Vehicles, Food)
+    if (!hasChildren && isObjectNode) {
+      return Object.fromEntries(node.text);
+    }
+
+    // Case: children map to nested keys (e.g. Items → Vehicles, Food)
+    if (hasChildren) {
+      const obj = {};
+      childrenMap[node.id].forEach(child => {
+        const key = typeof child.text === "string" ? child.text : undefined;
+        if (key !== undefined && key !== "") {
+          obj[key] = build(child);
+        } else if (Array.isArray(child.text)) {
+          // If child is an object, use it directly as value
+          const value = Object.fromEntries(child.text);
+          Object.assign(obj, value);
+        }
+      });
+      return obj;
+    }
+
+    // Fallback: raw string value (primitive)
+    return node.text;
+  }
+
+  const rootKey = typeof root.text === "string" ? root.text : undefined;
+  if (!rootKey || rootKey === "") {
+    const result = {};
+    if (childrenMap[root.id]) {
+      childrenMap[root.id].forEach(child => {
+        const key = typeof child.text === "string" ? child.text : undefined;
+        if (key !== undefined && key !== "") {
+          result[key] = build(child);
+        }
+      });
+    } else if (Array.isArray(root.text)) {
+      return Object.fromEntries(root.text);
+    } else {
+      return root.text;
+    }
+    return result;
+  } else {
+    return { [rootKey]: build(root) };
+  }
+}
+
+
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const selectedNode = useGraph(state => state.selectedNode);
   const path = selectedNode?.path || "";
@@ -98,7 +163,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const [value, setValue] = useState(() => dataToString(selectedNode?.text ?? {})); // Updated to allow for empty text
   const updateNode = useGraph(state => state.updateNode); // Function to update node data in global state
   const setContents = useFile(state => state.setContents); // Added to update text editor after node update
-  const nodes = useGraph(state => state.nodes); // Added to update text editor after node update
+  //const nodes = useGraph(state => state.nodes); // Added to update text editor after node update
   
 
   // Reset value when node changes or modal opens
@@ -109,34 +174,32 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
 
   // Attempt to save data on press of save button
   const handleSave = () => {
-    try {
-      const parsed = JSON.parse(value);
-      let newValue = parsed;
-      if (Array.isArray(selectedNode?.text)) {
-        newValue = parsed && typeof parsed === "object" && !Array.isArray(parsed)
-          ? Object.entries(parsed)
-          : parsed;
-      }
-
-      if (selectedNode && typeof selectedNode.id === "string") {
-        updateNode(selectedNode.id, newValue);
-
-        // --- Update the text editor JSON directly ---
-        const currentJson = JSON.parse(useFile.getState().contents);
-        // Assume selectedNode.path is an array like ["Items", "Vehicles", "Color"]
-        if (Array.isArray(selectedNode.path)) {
-          updateJsonAtPath(currentJson, selectedNode.path, newValue);
-          setContents({ contents: JSON.stringify(currentJson, null, 2) });
-        }
-
-        setEditMode(false);
-      } else {
-        alert("No node selected or invalid node id.");
-      }
-    } catch (e) {
-      alert("Invalid JSON");
+  try {
+    const parsed = JSON.parse(value);
+    let newValue = parsed;
+    if (Array.isArray(selectedNode?.text)) {
+      newValue = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? Object.entries(parsed)
+        : parsed;
     }
-  };
+
+    if (selectedNode && typeof selectedNode.id === "string") {
+      updateNode(selectedNode.id, newValue);
+
+      // --- NEW: Reconstruct JSON from current graph state ---
+      const nodes = useGraph.getState().nodes;
+      const edges = useGraph.getState().edges;
+      const newJson = reconstructJson(nodes, edges);
+      setContents({ contents: JSON.stringify(newJson, null, 2) });
+
+      setEditMode(false);
+    } else {
+      alert("No node selected or invalid node id.");
+    }
+  } catch (e) {
+    alert("Invalid JSON");
+  }
+};
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
