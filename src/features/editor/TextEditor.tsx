@@ -4,6 +4,8 @@ import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
 import useConfig from "../../store/useConfig";
 import useFile from "../../store/useFile";
+import { useRef } from "react";
+import debounce from "lodash.debounce";
 
 loader.config({
   paths: {
@@ -30,6 +32,9 @@ const TextEditor = () => {
   const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
+  const debouncedSetContents = useRef(
+    debounce((value) => setContents({ contents: value ?? "" }), 500)
+    ).current;
 
   React.useEffect(() => {
     monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -76,6 +81,7 @@ const TextEditor = () => {
     <StyledEditorWrapper>
       <StyledWrapper>
         <Editor
+          //key={contents}
           height="100%"
           language={fileType}
           theme={theme}
@@ -83,7 +89,7 @@ const TextEditor = () => {
           options={editorOptions}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
+          onChange={value => debouncedSetContents(value)}
           loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
