@@ -62,10 +62,27 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeText: (nodeId: string, newText: any) => void;
+
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
+  updateNodeText: (nodeId: string, newText: any) => {
+  set(state => {
+    const nodes = state.nodes.map(node => {
+      if (node.id === nodeId) {
+        return {
+          ...node,
+          text: newText, // update only the text field
+        };
+      }
+      return node;
+    });
+    return { nodes };
+  });
+},
+
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
     get().collapseGraph();
