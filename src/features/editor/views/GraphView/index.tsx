@@ -136,7 +136,7 @@ const GraphCanvas = ({ isWidget }: GraphProps) => {
   );
 };
 
-export const GraphView = ({ isWidget = false }: GraphProps) => {
+export const GraphView = ({ isWidget = false, onEditNode }: GraphProps & { onEditNode?: () => void }) => {
   const setViewPort = useGraph(state => state.setViewPort);
   const viewPort = useGraph(state => state.viewPort);
   const aboveSupportedLimit = useGraph(state => state.aboveSupportedLimit);
@@ -170,7 +170,7 @@ export const GraphView = ({ isWidget = false }: GraphProps) => {
     <Box pos="relative" h="100%" w="100%">
       {aboveSupportedLimit && <NotSupported />}
       <LoadingOverlay visible={debouncedLoading} />
-      {!isWidget && <OptionsMenu />}
+      {!isWidget && <OptionsMenu onEditNode={onEditNode} />}
       {!isWidget && <SecureInfo />}
       <ZoomControl />
       <StyledEditorWrapper

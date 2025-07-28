@@ -12,6 +12,8 @@ import useConfig from "../../../../store/useConfig";
 import { useModal } from "../../../../store/useModal";
 import type { LayoutDirection } from "../../../../types/graph";
 import useGraph from "./stores/useGraph";
+import { LuPencil } from "react-icons/lu"; 
+
 
 const StyledFlowIcon = styled(TiFlowMerge)<{ rotate: number }>`
   transform: rotate(${({ rotate }) => `${rotate}deg`});
@@ -31,7 +33,7 @@ const rotateLayout = (direction: LayoutDirection) => {
   return 360;
 };
 
-export const OptionsMenu = () => {
+export const OptionsMenu = ({ onEditNode }: { onEditNode?: () => void }) => {
   const toggleGestures = useConfig(state => state.toggleGestures);
   const toggleChildrenCount = useConfig(state => state.toggleChildrenCount);
   const toggleRulers = useConfig(state => state.toggleRulers);
@@ -85,16 +87,7 @@ export const OptionsMenu = () => {
   }, []);
 
   return (
-    <Flex
-      gap="xs"
-      align="center"
-      style={{
-        position: "absolute",
-        top: "10px",
-        left: "10px",
-        zIndex: 100,
-      }}
-    >
+    <Flex /* ... */>
       <Menu withArrow>
         <Menu.Target>
           <ActionIcon aria-label="actions" size="lg" color="gray" variant="light">
@@ -102,10 +95,14 @@ export const OptionsMenu = () => {
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
+          
           <Menu.Item
-            leftSection={<LuImageDown color="gray" />}
-            onClick={() => setVisible("DownloadModal", true)}
+            leftSection={<LuPencil />}
+            onClick={() => {
+              if (onEditNode) onEditNode();
+            }}
           >
+            Edit Node
             <Flex fz="xs" justify="space-between" gap="md">
               <Text fz="xs">Export as image</Text>
               <Text ml="md" fz={10} c="dimmed">
