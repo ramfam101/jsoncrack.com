@@ -4,7 +4,8 @@ import { NODE_DIMENSIONS } from "../../../../../constants/graph";
 import { TextRenderer } from "./TextRenderer";
 import * as Styled from "./styles";
 
-type Value = [string, string];
+
+type Value = [string, any];
 
 type RowProps = {
   val: Value;
@@ -37,9 +38,16 @@ const Node = ({ node, x, y }: CustomNodeProps) => (
     y={0}
     $isObject
   >
-    {(node.text as Value[]).map((val, idx) => (
-      <Row val={val} index={idx} x={x} y={y} key={idx} />
-    ))}
+    {Array.isArray(node.text)
+      ? (node.text as Value[]).map((val, idx) => (
+          <Row val={val} index={idx} x={x} y={y} key={idx} />
+        ))
+      : typeof node.text === "object" && node.text !== null
+        ? Object.entries(node.text).map(([key, value], idx) => (
+            <Row val={[key, value]} index={idx} x={x} y={y} key={idx} />
+          ))
+        : <TextRenderer>{String(node.text)}</TextRenderer>
+    }
   </Styled.StyledForeignObject>
 );
 
@@ -48,3 +56,4 @@ function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
 }
 
 export const ObjectNode = React.memo(Node, propsAreEqual);
+
