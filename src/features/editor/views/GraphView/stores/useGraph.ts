@@ -50,6 +50,7 @@ interface GraphActions {
   setSelectedNode: (nodeData: NodeData) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
+  updateNode: (nodeId: string, newValue: any) => void; // Implements ability to update node data
   expandGraph: () => void;
   collapseNodes: (nodeId: string) => void;
   collapseGraph: () => void;
@@ -144,6 +145,24 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       graphCollapsed: !!collapsedNodes.length,
     });
   },
+
+  // Implements updateNode functionality
+  updateNode: (nodeId, newValue) => {
+    set(state => {
+      const nodes = state.nodes.map(node =>
+        node.id === nodeId
+          ? { ...node, text: newValue }
+          : node
+      );
+      // Also update selectedNode if it's the one being edited
+      const selectedNode =
+        state.selectedNode && state.selectedNode.id === nodeId
+          ? { ...state.selectedNode, text: newValue }
+          : state.selectedNode;
+      return { nodes, selectedNode };
+    });
+  },
+
   collapseNodes: nodeId => {
     const [childrenNodes] = getOutgoers(nodeId, get().nodes, get().edges);
     const childrenEdges = getChildrenEdges(childrenNodes, get().edges);
