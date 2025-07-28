@@ -24,7 +24,7 @@ export const useNodeEdit = (initialValue: string): UseNodeEditReturns => {
         setEditValue(initialValue);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!selectedNode?.path) return;
 
         try {
@@ -55,16 +55,7 @@ export const useNodeEdit = (initialValue: string): UseNodeEditReturns => {
             // Update the value
             target[lastKey] = newValue;
 
-            // First, exit edit mode
-            setIsEditing(false);
-            
-            // Then update edit value
-            setEditValue(JSON.stringify(newValue, null, 2));
-
-            // Finally update the actual data
-            setContents({ contents: JSON.stringify(currentJson, null, 2) });
-
-            // Update the nodes in the graph
+            // Update the graph store state first
             const updatedNodes = nodes.map(node => {
                 if (node.id === selectedNode.id) {
                     return {
@@ -78,8 +69,22 @@ export const useNodeEdit = (initialValue: string): UseNodeEditReturns => {
                 return node;
             });
 
-            // Update the graph nodes
-            setNodes(updatedNodes);
+            const updatedNode = updatedNodes.find(node => node.id === selectedNode.id);
+            if (updatedNode) {
+                // Update both nodes and selectedNode in one state update
+                useGraph.setState(state => ({
+                    ...state,
+                    nodes: updatedNodes,
+                    selectedNode: updatedNode
+                }));
+            }
+
+            // Then update the file contents
+            await setContents({ contents: JSON.stringify(currentJson, null, 2) });
+
+            // Finally update local state
+            setIsEditing(false);
+            setEditValue(JSON.stringify(newValue, null, 2));
         } catch (error) {
             console.error('Failed to update node:', error);
             // You might want to show an error toast here
