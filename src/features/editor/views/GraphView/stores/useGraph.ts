@@ -62,10 +62,14 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+
+  // <-- NEW action added here:
+  updateNodeText: (id: string, newText: string | [string, string][]) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
+
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
     get().collapseGraph();
@@ -233,6 +237,30 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+
+  // NEW: updateNodeText action implementation
+  updateNodeText: (id, newText) => {
+    set(state => {
+      const updatedNodes = state.nodes.map(node => {
+        if (node.id === id) {
+          return {
+            ...node,
+            text: newText,
+          };
+        }
+        return node;
+      });
+
+      const updatedSelectedNode = state.selectedNode?.id === id
+        ? { ...state.selectedNode, text: newText }
+        : state.selectedNode;
+
+      return {
+        nodes: updatedNodes,
+        selectedNode: updatedSelectedNode,
+      };
+    });
+  },
 }));
 
 export default useGraph;
