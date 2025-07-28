@@ -7,6 +7,7 @@ import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
+import useFile from "../../../../../store/useFile";
 
 export interface Graph {
   viewPort: ViewPort | null;
@@ -62,6 +63,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (newText: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,77 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateSelectedNodeText: (newValue: any) => {
+    set(state => {
+      if (!state.selectedNode) return {};
+
+      const updatedNode = { ...state.selectedNode, text: newValue };
+      const updatedNodes = state.nodes.map(node =>
+        node.id === updatedNode.id ? updatedNode : node
+      );
+
+      const pathString = state.selectedNode.path;
+
+      // Get the current JSON as a string
+      let currentJsonString = useJson.getState().json;
+      if (typeof currentJsonString !== "string") {
+        currentJsonString = JSON.stringify(currentJsonString, null, 2);
+      }
+
+      // Parse to object
+      let currentJsonObj;
+      try {
+        currentJsonObj = JSON.parse(currentJsonString);
+      } catch {
+        currentJsonObj = {};
+      }
+
+      let updatedJsonObj;
+
+      // If root node, replace the whole JSON
+      if (!pathString || pathString === "{Root}") {
+        updatedJsonObj = newValue;
+      } else {
+        // Convert path string to array, but skip "{Root}" if present
+        let pathArray = pathString.split('.').filter(p => p !== "{Root}").map(p => (p.match(/^\d+$/) ? Number(p) : p));
+
+        // Helper to set value at path
+        function setValue(obj: any, path: (string | number)[], value: any) {
+          let temp = obj;
+          for (let i = 0; i < path.length - 1; i++) {
+            const key = path[i];
+            if (typeof key === "number") {
+              if (!Array.isArray(temp[key])) temp[key] = [];
+            } else {
+              if (typeof temp[key] !== "object" || temp[key] === null) temp[key] = {};
+            }
+            temp = temp[key];
+          }
+          temp[path[path.length - 1]] = value;
+        }
+
+        updatedJsonObj = JSON.parse(JSON.stringify(currentJsonObj));
+        if (pathArray.length === 0) {
+          // If after filtering, path is empty, replace root
+          updatedJsonObj = newValue;
+        } else {
+          setValue(updatedJsonObj, pathArray, newValue);
+        }
+      }
+
+      // Stringify back to string
+      const updatedJsonString = JSON.stringify(updatedJsonObj, null, 2);
+
+      // Update both stores as string
+      useJson.getState().setJson(updatedJsonString);
+      useFile.getState().setContents({ contents: updatedJsonString });
+
+      return {
+        selectedNode: updatedNode,
+        nodes: updatedNodes,
+      };
+    });
+  },
 }));
 
 export default useGraph;
