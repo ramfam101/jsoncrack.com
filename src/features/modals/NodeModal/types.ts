@@ -1,13 +1,5 @@
-export intexport interface UseNodeEditReturns {
+export interface NodeEditFormProps {
     isEditing: boolean;
-    editValue: string;
-    handleEdit: () => void;
-    handleCancel: () => void;
-    handleSave: () => Promise<void>;
-    handleEditValueChange: (value: string) => void;
-    setEditValue: (value: string) => void;
-}NodeEditFormProps {
-    isEditing: boolean
     editValue: string;
     nodeData: string;
     onEdit: () => void;
@@ -20,7 +12,7 @@ export interface UseNodeEditReturns {
     isEditing: boolean;
     editValue: string;
     handleEdit: () => void;
-    handleCancel: () => void
-    handleSave: () => void;
+    handleCancel: () => void;
+    handleSave: () => Promise<void>;
     handleEditValueChange: (value: string) => void;
 }
