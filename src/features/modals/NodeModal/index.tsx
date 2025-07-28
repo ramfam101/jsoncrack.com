@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import type { EdgeData, NodeData } from "../../../types/graph";
+import { Modal, Stack, Text, Textarea, ScrollArea, Group, Button } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
@@ -15,22 +16,24 @@ const dataToString = (data: any) => {
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const node = useGraph(state => state.selectedNode);
-  const path = node?.path || "";
-  const [editValue, setEditValue] = useState(() => dataToString(node?.text));
-  const updateNode = useGraph(state => state.updateSelectedNode); // You need to implement this in your store
+  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
+  const path = useGraph(state => state.selectedNode?.path || "");
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [editValue, setEditValue] = React.useState(nodeData)
+  const updateSelectedNode = useGraph(state => state.updateSelectedNode); // needs to be implemented
 
-  React.useEffect(() => {
-    setEditValue(dataToString(node?.text));
-  }, [node]);
+  const handleEdit = () => {
+    setEditValue(nodeData); // set edit value to current node data 
+    setIsEditing(true);
+  }
+  const handleCancel = () => setIsEditing(false);
 
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(editValue);
-      updateNode(parsed); // Implement this function in your Zustand store
+      const parsedEdit = JSON.parse(editValue);
+      updateSelectedNode(parsedEdit);
       setIsEditing(false);
-    } catch (e) {
+    } catch {
       alert("Invalid JSON");
     }
   };
@@ -39,31 +42,29 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
-          <Stack direction="row" justify="space-between" align="right">
-            <Text fz="xs" fw={500}>
-              Content
-            </Text>
-            {!isEditing && (
-              <button onClick={() => setIsEditing(true)}>Edit</button>
+          <Group mt="xs" mb="md" justify="space-between"> 
+            <Text fz="xs" fw={500}> Content </Text>
+            {!isEditing && ( // show edit button when not editing
+              <Button onClick={handleEdit}> Edit </Button>
             )}
-          </Stack>
+            {isEditing && ( // show save and cancel buttons when editing
+              <Group justify="right">
+                <Button color = "green" onClick={handleSave}>Save</Button>
+                <Button variant="outline" color = "red" onClick={handleCancel}>Cancel</Button>
+              </Group>
+            )}
+          </Group>  
           <ScrollArea.Autosize mah={250} maw={600}>
-            {isEditing ? (
-              <textarea
-                style={{ width: "100%", minHeight: 150 }}
+            {isEditing ? (  // change to editable textarea when editing
+              <Textarea
+                autosize
                 value={editValue}
                 onChange={e => setEditValue(e.target.value)}
               />
             ) : (
-              <CodeHighlight code={dataToString(node?.text)} miw={350} maw={600} language="json" withCopyButton />
+              <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
             )}
-          </ScrollArea.Autosize>
-          {isEditing && (
-            <Stack direction="row" gap="xs">
-              <button onClick={handleSave}>Save</button>
-              <button onClick={() => setIsEditing(false)}>Cancel</button>
-            </Stack>
-          )}
+            </ScrollArea.Autosize>
         </Stack>
         <Text fz="xs" fw={500}>
           JSON Path
