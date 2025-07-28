@@ -9,22 +9,34 @@ import { useNodeEdit } from "./useNodeEdit";
 
 // return object from json removing array and object fields
 const normalizeNodeData = (nodeRows: NodeData["text"]) => {
-  if (!nodeRows || nodeRows.length === 0) return "{}";
-  if (nodeRows.length === 1 && !nodeRows[0].key) return `${nodeRows[0].value}`;
+  if (!nodeRows) return "{}";
+  
+  // If text is a string, return it as is
+  if (typeof nodeRows === "string") {
+    return nodeRows;
+  }
+  
+  // If text is an array of [key, value] pairs
+  if (Array.isArray(nodeRows)) {
+    if (nodeRows.length === 0) return "{}";
+    if (nodeRows.length === 1 && !nodeRows[0][0]) return `${nodeRows[0][1]}`;
 
-  const obj = {};
-  nodeRows?.forEach(row => {
-    if (row.type !== "array" && row.type !== "object") {
-      if (row.key) obj[row.key] = row.value;
-    }
-  });
-  return JSON.stringify(obj, null, 2);
+    const obj = {};
+    nodeRows?.forEach(([key, value]) => {
+      if (key) obj[key] = value;
+    });
+    return JSON.stringify(obj, null, 2);
+  }
+  
+  return "{}";
 };
 
 // return json path in the format $["customer"]
 const jsonPathToString = (path?: NodeData["path"]) => {
-  if (!path || path.length === 0) return "$";
-  return `$["${path.join('"]["')}"]`;
+  if (!path) return "$";
+  // The path is already a formatted string, so we can return it directly
+  // or format it as a JSONPath expression
+  return path.startsWith("$") ? path : `$.${path}`;
 };
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {

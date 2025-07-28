@@ -15,7 +15,10 @@ export const NodeEditForm: React.FC<NodeEditFormProps> = ({
           size="xs"
           variant="light"
           color="blue"
-          onClick={onEdit}
+          onClick={() => {
+            console.log('Edit button clicked');
+            onEdit();
+          }}
         >
           Edit
         </Button>
@@ -26,7 +29,13 @@ export const NodeEditForm: React.FC<NodeEditFormProps> = ({
             variant="light"
             color="green"
             onClick={async () => {
-              await onSave();
+              console.log('Save button clicked');
+              try {
+                await onSave();
+                console.log('Save completed');
+              } catch (error) {
+                console.error('Save failed:', error);
+              }
             }}
           >
             Save
@@ -35,7 +44,10 @@ export const NodeEditForm: React.FC<NodeEditFormProps> = ({
             size="xs"
             variant="light"
             color="gray"
-            onClick={onCancel}
+            onClick={() => {
+              console.log('Cancel button clicked');
+              onCancel();
+            }}
           >
             Cancel
           </Button>
