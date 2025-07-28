@@ -47,10 +47,10 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
 
 
   React.useEffect(() => {
-    setJsonText(dataToString(selectedNode?.text));
-    setError(null);
-    setIsEditing(false);
-  }, [selectedNode]);
+  if (selectedNode?.text) {
+    setEditValue(dataToString(selectedNode.text));
+  }
+}, [selectedNode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setJsonText(e.target.value);
@@ -59,7 +59,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
 
   const handleSave = () => {
   try {
-    const parsed = JSON.parse(jsonText);
+    const parsed = JSON.parse(editValue);
     const rJson = useFile.getState().contents;
     const rObj = JSON.parse(rJson);
 
@@ -101,27 +101,37 @@ const handleCancel = () => {
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
         <Stack gap="xs">
-          <Text fz="xs" fw={500}>Content</Text>
-          {isEditing ? (
-            <Group gap={5}>
-              <Button color="green" onClick={() => {handleSave(); setIsEditing(false);}}>Save</Button>            
-              <Button color="gray" onClick={() => {setEditValue(dataToString(selectedNode?.text));setIsEditing(false)}}>Cancel</Button>
-            </Group>
-          ) : (
-            <Button onClick={() => setIsEditing(true)}>Edit</Button>
-          )}
-          <Textarea
-            value={jsonText}
-            onChange={handleChange}
-            minRows={6}
-            autosize
-            error={error}
-            maw={600}
-            miw={350}
-            spellCheck={false}
-          />
-          {error && <Text color="red" fz="xs">{error}</Text>}
+          <Group justify="space-between" align="center">
+            <Text fz="xs" fw={500}>Content</Text>
+            {isEditing ? (
+              <Group gap={10}>
+                <Button color="green" size="xs" onClick={handleSave}>Save</Button>
+                <Button variant="default" size="xs" onClick={handleCancel}>Cancel</Button>
+              </Group>
+            ) : (
+              <Button size="xs" onClick={() => {
+                setEditValue(dataToString(selectedNode?.text));
+                setIsEditing(true);
+              }}>
+                Edit
+              </Button>
+            )}
+          </Group>
           <ScrollArea.Autosize mah={250} maw={600}>
+            {isEditing ? (
+              <Textarea
+                value={editValue}
+                onChange={e => setEditValue(e.currentTarget.value)}
+                autosize
+                minRows={6}
+                maxRows={12}
+                maw={600}
+                miw={350}
+                styles={{ input: { fontFamily: "monospace" } }}
+              />
+            ) : (
+              <CodeHighlight code={dataToString(selectedNode?.text)} miw={350} maw={600} language="json" withCopyButton />
+            )}
           </ScrollArea.Autosize>
         </Stack>
         <Text fz="xs" fw={500}>
