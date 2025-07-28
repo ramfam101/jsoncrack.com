@@ -65,14 +65,14 @@ export const StyledForeignObject = styled.foreignObject<{ $isObject?: boolean }>
 `;
 
 export const StyledKey = styled.span<{ $parent?: boolean; $type: string; $value?: string }>`
-  display: ${({ $parent }) => ($parent ? "flex" : "inline")};
+  display: flex;
   align-items: center;
-  justify-content: center; // Always center for parent nodes
+  justify-content: space-between;
   flex: 1;
   min-width: 0;
   height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "auto")};
   line-height: ${({ $parent }) => ($parent ? `${NODE_DIMENSIONS.PARENT_HEIGHT}px` : "inherit")};
-  padding: 0; // Remove padding
+  padding: 0;
   color: ${({ theme, $type, $parent = false, $value = "" }) =>
     getTextColor({ $parent, $type, $value, theme })};
   overflow: hidden;
