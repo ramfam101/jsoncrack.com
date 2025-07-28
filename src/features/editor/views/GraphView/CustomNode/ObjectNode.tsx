@@ -28,20 +28,24 @@ const Row = ({ val, x, y, index }: RowProps) => {
   );
 };
 
-const Node = ({ node, x, y }: CustomNodeProps) => (
-  <Styled.StyledForeignObject
-    data-id={`node-${node.id}`}
-    width={node.width}
-    height={node.height}
-    x={0}
-    y={0}
-    $isObject
-  >
-    {(node.text as Value[]).map((val, idx) => (
-      <Row val={val} index={idx} x={x} y={y} key={idx} />
-    ))}
-  </Styled.StyledForeignObject>
-);
+const Node = ({ node, x, y }: CustomNodeProps) => {
+  console.log("ObjectNode render", node); // <-- Add this line
+
+  return (
+    <Styled.StyledForeignObject
+      data-id={`node-${node.id}`}
+      width={node.width}
+      height={node.height}
+      x={0}
+      y={0}
+      $isObject
+    >
+      {(node.text as Value[]).map((val, idx) => (
+        <Row val={val} index={idx} x={x} y={y} key={idx} />
+      ))}
+    </Styled.StyledForeignObject>
+  );
+};
 
 function propsAreEqual(prev: CustomNodeProps, next: CustomNodeProps) {
   return String(prev.node.text) === String(next.node.text) && prev.node.width === next.node.width;

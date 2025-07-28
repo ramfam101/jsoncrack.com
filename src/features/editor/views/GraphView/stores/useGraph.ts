@@ -48,6 +48,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateNode: (path: string, newValue: any) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -64,6 +65,25 @@ interface GraphActions {
   setZoomFactor: (zoomFactor: number) => void;
 }
 
+function nodesToJson(nodes: { path?: string; text: any }[]): any {
+  const result: Record<string, any> = {};
+
+  nodes.forEach(node => {
+    if (!node.path) return; // skip nodes without a path
+    console.log("Processing node:", node.path, node.text);
+    // Only process direct children of root (e.g., {Root}.fruit)
+    const match = node.path.match(/^\{Root\}\.([^\.]+)$/);
+    if (match && Array.isArray(node.text)) {
+      console.log("Matched node path:", match[1]);
+      const key = match[1];
+      console.log("Setting key:", key, "with value:", node.text);
+      result[key] = Object.fromEntries(node.text);
+    }
+  });
+
+  return result;
+}
+
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
   toggleCollapseAll: collapseAll => {
@@ -74,8 +94,34 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateNode: (path: string, newValue: any) => {
+  set((state: Graph) => {
+    let updated = true;
+    const nodes = state.nodes.map(node => {
+      if (!updated && node.path === path) {
+        updated = true;
+        return { ...node, text: newValue };
+      }
+      updated = !updated;
+      return node;
+    });
+
+    const updatedJson = nodesToJson(nodes);
+    console.log("Updated JSON:", updatedJson);
+
+    // FIX: Always stringify before calling setJson!
+    useJson.getState().setJson(JSON.stringify(updatedJson, null, 2));
+
+    // This will update the graph view as before
+    get().setGraph(updatedJson);
+
+    return { ...state, nodes };
+  });
+},
   setGraph: (data, options) => {
-    const { nodes, edges } = parser(data ?? useJson.getState().json);
+    const jsonData = data ?? useJson.getState().json;
+    const jsonString = typeof jsonData === "string" ? jsonData : JSON.stringify(jsonData);
+    const { nodes, edges } = parser(jsonString);
 
     if (get().collapseAll) {
       if (nodes.length > SUPPORTED_LIMIT) {
