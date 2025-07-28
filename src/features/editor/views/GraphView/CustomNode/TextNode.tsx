@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import { MdLink, MdLinkOff } from "react-icons/md";
 import type { CustomNodeProps } from ".";
@@ -64,12 +64,25 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
   const isImage = imagePreviewEnabled && isContentImage(text as string);
   const value = JSON.stringify(text).replaceAll('"', "");
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedValue, setEditedValue] = useState(value);
+
   const handleExpand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     if (!isExpanded) collapseNodes(id);
     else expandNodes(id);
     validateHiddenNodes();
+  };
+
+  const handleEdit = () => {
+    console.log("Edit button clicked");
+    setIsEditing(true);
+  };
+  const handleSave = () => {
+    setIsEditing(false);
+    // Update the node content here
+    node.text = JSON.parse(editedValue); // Assuming `text` is an object
   };
 
   const childrenCountText = useMemo(() => {
@@ -99,8 +112,23 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           $isParent={isParent}
         >
           <Styled.StyledKey $value={value} $parent={isParent} $type={type}>
-            <TextRenderer>{value}</TextRenderer>
+            {isEditing ? (
+              <textarea
+                value={editedValue}
+                onChange={(e) => setEditedValue(e.target.value)}
+                rows={5}
+                cols={30}
+              />
+            ) : (
+              <TextRenderer>{value}</TextRenderer>
+            )}
           </Styled.StyledKey>
+          {isEditing ? (
+            <button onClick={handleSave}>Save</button>
+          ) : (
+            <button onClick={handleEdit}>Edit</button>
+          )}
+  
           {isParent && childrenCount > 0 && childrenCountVisible && (
             <Styled.StyledChildrenCount>{childrenCountText}</Styled.StyledChildrenCount>
           )}
