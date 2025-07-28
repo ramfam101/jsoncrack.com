@@ -61,19 +61,7 @@ const CustomNodeWrapper = (nodeProps: NodeProps<NodeData["data"]>) => {
           ) : (
             <TextNode node={node as NodeData} hasCollapse={!!data?.childrenCount} x={x} y={y} />
           )}
-          {/* Edit button overlay */}
-          <foreignObject x={x - 20} y={y - 40} width={40} height={30} style={{ pointerEvents: "auto" }}>
-            <button
-              style={{ fontSize: 12, padding: "2px 6px", borderRadius: 4, border: "1px solid #ccc", background: "#f3f3f3", cursor: "pointer" }}
-              onClick={e => {
-                e.stopPropagation();
-                setSelectedNode(node as NodeData);
-                setVisible("NodeModal", true);
-              }}
-            >
-              Edit
-            </button>
-          </foreignObject>
+          {/* Removed Edit button overlay. Edit modal now opens only on node click. */}
         </g>
       )}
     </Node>

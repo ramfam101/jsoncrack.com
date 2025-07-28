@@ -43,7 +43,8 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     try {
       const parsed = JSON.parse(editValue);
       if (selectedNode && typeof selectedNode.path === "string") {
-        updateNodeValue(selectedNode.path, parsed);
+        // Normalize path: remove {Root}. or similar prefix
+        let normalizedPath = selectedNode.path.replace(/^{Root}\.?/, "");
         // Update left-hand editor with the full updated JSON
         const contents = useFile.getState().contents;
         let fullJson;
@@ -52,11 +53,24 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
         } catch {
           fullJson = {};
         }
-        const updatedJson = updateJsonAtPath(fullJson, selectedNode.path, parsed);
-        setContents({ contents: JSON.stringify(updatedJson, null, 2) });
+        const updatedJson = updateJsonAtPath(fullJson, normalizedPath, parsed);
+        const updatedJsonStr = JSON.stringify(updatedJson, null, 2);
+        // Debug log
+        console.log('[NodeModal] Saving node:', {
+          path: selectedNode.path,
+          normalizedPath,
+          parsed,
+          updatedJsonStr,
+          fullJson,
+        });
+        setContents({ contents: updatedJsonStr });
+        // Force graph update immediately
+        const useJson = require("../../../store/useJson").default;
+        useJson.getState().setJson(updatedJsonStr);
       }
       setIsEditing(false);
-    } catch {
+    } catch (err) {
+      console.error('[NodeModal] Failed to save node:', err);
       // Optionally show error
     }
   };
