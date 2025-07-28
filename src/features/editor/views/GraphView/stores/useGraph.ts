@@ -84,30 +84,19 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
-  updateNodeText: (id: string, newText: string, path?: string) => {
-    set(state => {
-      const nodes = state.nodes.map(node =>
-        node.id === id ? { ...node, text: newText } : node
-      );
-      const selectedNode =
-        state.selectedNode && state.selectedNode.id === id
-          ? { ...state.selectedNode, text: newText }
-          : state.selectedNode;
+updateNodeText: (id: string, newText: string) => {
+  set(state => {
+    const nodes = state.nodes.map(node =>
+      node.id === id ? { ...node, text: newText } : node
+    );
+    const selectedNode =
+      state.selectedNode && state.selectedNode.id === id
+        ? { ...state.selectedNode, text: newText }
+        : state.selectedNode;
 
-      // Update main JSON text editor if path is provided
-      if (path) {
-        const mainJson = useJson.getState().json;
-        const updatedJson = updateJsonAtPath(mainJson, path, newText);
-        useJson.getState().setContents({
-          contents: JSON.stringify(updatedJson, null, 2),
-          format: "json",
-          hasChanges: true,
-        });
-      }
-
-      return { nodes, selectedNode };
-    });
-  },
+    return { nodes, selectedNode };
+  });
+},
   
 
   setGraph: (data, options) => {
@@ -269,6 +258,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  
 }));
 
 export default useGraph;
