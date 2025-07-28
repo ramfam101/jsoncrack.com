@@ -61,6 +61,7 @@ const CustomNodeWrapper = (nodeProps: NodeProps<NodeData["data"]>) => {
           ) : (
             <TextNode node={node as NodeData} hasCollapse={!!data?.childrenCount} x={x} y={y} />
           )}
+          {/* Removed Edit button overlay. Edit modal now opens only on node click. */}
         </g>
       )}
     </Node>
