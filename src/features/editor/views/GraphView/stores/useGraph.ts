@@ -1,7 +1,6 @@
+// ...existing code...
 
 
-// ...existing code...
-// ...existing code...
 import type { ViewPort } from "react-zoomable-ui/dist/ViewPort";
 import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
 import { create } from "zustand";
@@ -234,4 +233,6 @@ const useGraph = create<Graph & {
     },
   }
 ));
+
+export default useGraph;
 
