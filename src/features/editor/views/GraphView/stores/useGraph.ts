@@ -48,6 +48,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateNode: (id: string, value: any) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -74,38 +75,64 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateNode: (id, value) => {
+    const updatedNodes = get().nodes.map(node =>
+      node.id === id ? { ...node, text: value } : node
+    );
+    set({ nodes: updatedNodes });
+
+    const selected = get().selectedNode;
+    if (selected?.id === id) {
+      set({ selectedNode: { ...selected, text: value } });
+    }
+  },
   setGraph: (data, options) => {
-    const { nodes, edges } = parser(data ?? useJson.getState().json);
+    try {
+      const rawData = data ?? useJson.getState().json;
+      console.log("[setGraph] Raw input JSON:", rawData);
 
-    if (get().collapseAll) {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({ aboveSupportedLimit: true, ...options, loading: false });
-      }
 
-      set({ nodes, edges, aboveSupportedLimit: false, ...options });
-      get().collapseGraph();
-    } else {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({
-          aboveSupportedLimit: true,
+      const { nodes, edges } = parser(rawData);
+      console.log("[setGraph] Parsed nodes:", nodes);
+      console.log("[setGraph] Parsed edges:", edges);
+
+      if (get().collapseAll) {
+        if (nodes.length > SUPPORTED_LIMIT) {
+          console.warn("[setGraph] Node count exceeds supported limit");
+          return set({ aboveSupportedLimit: true, ...options, loading: false });
+        }
+
+        set({ nodes, edges, aboveSupportedLimit: false, ...options });
+        get().collapseGraph();
+      } else {
+        if (nodes.length > SUPPORTED_LIMIT) {
+          console.warn("[setGraph] Node count exceeds supported limit");
+          return set({
+            aboveSupportedLimit: true,
+            collapsedParents: [],
+            collapsedNodes: [],
+            collapsedEdges: [],
+            ...options,
+            loading: false,
+          });
+        }
+
+        set({
+          nodes,
+          edges,
           collapsedParents: [],
           collapsedNodes: [],
           collapsedEdges: [],
+          graphCollapsed: false,
+          aboveSupportedLimit: false,
           ...options,
-          loading: false,
         });
       }
 
-      set({
-        nodes,
-        edges,
-        collapsedParents: [],
-        collapsedNodes: [],
-        collapsedEdges: [],
-        graphCollapsed: false,
-        aboveSupportedLimit: false,
-        ...options,
-      });
+      console.log("[setGraph] Graph state set successfully");
+    } catch (error) {
+      console.error("[setGraph] Failed to parse and set graph:", error);
+      set({ loading: false });
     }
   },
   setDirection: (direction = "RIGHT") => {
@@ -178,7 +205,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       .map(node => node.id);
 
     const closestParentToRoot = Math.min(...collapsedParents.map(n => +n));
-    const focusNodeId = `g[id*='node-${closestParentToRoot}']`;
+    const focusNodeId = `g[id*="node-${closestParentToRoot}"]`;
     const rootNode = document.querySelector(focusNodeId);
 
     set({
