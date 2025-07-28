@@ -6,13 +6,13 @@ export intexport interface UseNodeEditReturns {
     handleSave: () => Promise<void>;
     handleEditValueChange: (value: string) => void;
     setEditValue: (value: string) => void;
-}odeEditFormProps {
+}NodeEditFormProps {
     isEditing: boolean
     editValue: string;
     nodeData: string;
     onEdit: () => void;
     onCancel: () => void;
-    onSave: () => void;
+    onSave: () => Promise<void>;
     onEditValueChange: (value: string) => void;
 }
 

@@ -25,7 +25,9 @@ export const NodeEditForm: React.FC<NodeEditFormProps> = ({
             size="xs"
             variant="light"
             color="green"
-            onClick={onSave}
+            onClick={async () => {
+              await onSave();
+            }}
           >
             Save
           </Button>

@@ -29,7 +29,14 @@ const jsonPathToString = (path?: NodeData["path"]) => {
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => state.selectedNode);
-  const normalizedData = normalizeNodeData(nodeData?.text ?? []);
+  const [normalizedData, setNormalizedData] = React.useState("");
+
+  React.useEffect(() => {
+    if (nodeData?.text) {
+      setNormalizedData(normalizeNodeData(nodeData.text));
+    }
+  }, [nodeData?.text]);
+
   const { 
     isEditing,
     editValue,
