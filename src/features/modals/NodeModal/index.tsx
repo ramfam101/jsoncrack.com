@@ -4,6 +4,7 @@ import { Modal, Stack, Text, ScrollArea, Flex, CloseButton } from "@mantine/core
 import { CodeHighlight } from "@mantine/code-highlight";
 import type { NodeData } from "../../../types/graph";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import { NodeEditForm } from "./NodeEditForm";
 
 // return object from json removing array and object fields
 const normalizeNodeData = (nodeRows: NodeData["text"]) => {
@@ -32,11 +33,14 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     <Modal size="auto" opened={opened} onClose={onClose} centered withCloseButton={false}>
       <Stack pb="sm" gap="sm">
         <Stack gap="xs">
-          <Flex justify="space-between" align="center">
+          <Flex justify="space-between" align="center" gap="md">
             <Text fz="xs" fw={500}>
               Content
             </Text>
-            <CloseButton onClick={onClose} />
+            <Flex gap="md" align="center">
+              <NodeEditForm />
+              <CloseButton onClick={onClose} />
+            </Flex>
           </Flex>
           <ScrollArea.Autosize mah={250} maw={600}>
             <CodeHighlight
