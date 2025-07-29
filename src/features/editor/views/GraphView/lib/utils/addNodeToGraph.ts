@@ -7,10 +7,11 @@ type Props = {
   text: string | [string, string][];
   isEmpty?: boolean;
   type?: NodeType;
+  path: string; // <-- Add this line
 };
 
-export const addNodeToGraph = ({ graph, text, type = "null", isEmpty = false }: Props) => {
-  const id = String(graph.nodes.length + 1);
+export const addNodeToGraph = ({ graph, text, type = "null", isEmpty = false, path }: Props) => {
+  const id = path; // <-- Use the path as the node's id
   const isParent = type === "array" || type === "object";
   const { width, height } = calculateNodeSize(text, isParent);
 

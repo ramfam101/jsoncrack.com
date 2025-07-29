@@ -12,6 +12,7 @@ type Traverse = {
   parentType?: string;
   myParentId?: string;
   nextType?: string;
+  path: string; // <-- Add this line
 };
 
 const isPrimitiveOrNullType = (type: unknown): type is PrimitiveOrNullType => {
@@ -29,13 +30,15 @@ const alignChildren = (nodeA: Node, nodeB: Node): number => {
   return 0;
 };
 
+// Update handleNoChildren to accept and use path
 function handleNoChildren(
   value: string | undefined,
   states: States,
   graph: Graph,
   myParentId?: string,
   parentType?: string,
-  nextType?: string
+  nextType?: string,
+  path?: string // <-- Add this line
 ) {
   if (value === undefined) return;
 
@@ -47,7 +50,12 @@ function handleNoChildren(
       states.brotherKey = value;
     }
   } else if (parentType === "array") {
-    const nodeFromArrayId = addNodeToGraph({ graph, text: String(value) });
+    const nodeFromArrayId = addNodeToGraph({
+      graph,
+      text: String(value),
+      type: "string",
+      path: path || "",
+    });
 
     if (myParentId) {
       addEdgeToGraph(graph, myParentId, nodeFromArrayId);
@@ -59,13 +67,15 @@ function handleNoChildren(
   }
 }
 
+// Update handleHasChildren to accept and use path
 function handleHasChildren(
   type: NodeType,
   states: States,
   graph: Graph,
   children: Node[],
   myParentId?: string,
-  parentType?: string
+  parentType?: string,
+  path?: string // <-- Add this line
 ) {
   let parentId: string | undefined;
 
@@ -115,7 +125,12 @@ function handleHasChildren(
     }
 
     // Add parent node
-    parentId = addNodeToGraph({ graph, type, text: states.parentName });
+    parentId = addNodeToGraph({
+      graph,
+      type,
+      text: states.parentName,
+      path: path || "",
+    });
     states.bracketOpen.push({ id: parentId, type });
     states.parentName = "";
 
@@ -140,27 +155,35 @@ function handleHasChildren(
   } else if (parentType === "array") {
     states.objectsFromArray = [...states.objectsFromArray, states.objectsFromArrayId++];
   }
-  const traverseObject = (objectToTraverse: Node, nextType: string) => {
+  const traverseObject = (objectToTraverse: Node, nextType: string, childPath: string) => {
     traverse({
       states,
       objectToTraverse,
       parentType: type,
       myParentId: states.bracketOpen[states.bracketOpen.length - 1]?.id,
       nextType,
+      path: childPath,
     });
   };
 
   const traverseArray = () => {
     children.forEach((objectToTraverse, index, array) => {
       const nextType = array[index + 1]?.type;
-
-      traverseObject(objectToTraverse, nextType);
+      // Build child path for array items
+      const childPath = path ? `${path}[${index}]` : `[${index}]`;
+      traverseObject(objectToTraverse, nextType, childPath);
     });
   };
 
   if (type === "object") {
     children.sort(alignChildren);
-    traverseArray();
+    children.forEach(child => {
+      // Build child path for object properties
+      const keyNode = child.children?.[0];
+      const key = keyNode?.value;
+      const childPath = key ? `${path}.${key}` : path || "";
+      traverseObject(child, undefined, childPath);
+    });
   } else {
     traverseArray();
   }
@@ -190,7 +213,12 @@ function handleHasChildren(
           states.brothersNode = [];
         }
       } else {
-        const brothersNodeId = addNodeToGraph({ graph, text: states.brothersNode });
+        const brothersNodeId = addNodeToGraph({
+          graph,
+          text: states.brothersNode,
+          type: "object", // or "array" or "string" depending on context
+          path: path || ""
+        });
 
         states.brothersNode = [];
 
@@ -243,13 +271,14 @@ export const traverse = ({
   myParentId,
   nextType,
   parentType,
+  path,
 }: Traverse) => {
   const graph = states.graph;
   const { type, children, value } = objectToTraverse;
 
   if (!children) {
-    handleNoChildren(value, states, graph, myParentId, parentType, nextType);
+    handleNoChildren(value, states, graph, myParentId, parentType, nextType, path);
   } else if (children) {
-    handleHasChildren(type, states, graph, children, myParentId, parentType);
+    handleHasChildren(type, states, graph, children, myParentId, parentType, path);
   }
 };

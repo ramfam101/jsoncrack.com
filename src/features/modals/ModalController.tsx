@@ -12,7 +12,11 @@ const Modal = ({ modalKey }: { modalKey: ModalName }) => {
 };
 
 const ModalController = () => {
-  return modals.map(modal => <Modal key={modal} modalKey={modal} />);
+  return (
+    <>
+      {modals.map(modal => <Modal key={modal} modalKey={modal} />)}
+    </>
+  );
 };
 
 export default ModalController;
