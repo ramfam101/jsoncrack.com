@@ -1,10 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { LoadingOverlay } from "@mantine/core";
 import styled from "styled-components";
 import Editor, { type EditorProps, loader, type OnMount, useMonaco } from "@monaco-editor/react";
-import * as XLSX from "xlsx";
-import { FileFormat } from "../../enums/file.enum";
-import { contentToJson } from "../../lib/utils/jsonAdapter";
 import useConfig from "../../store/useConfig";
 import useFile from "../../store/useFile";
 
@@ -33,25 +30,6 @@ const TextEditor = () => {
   const getHasChanges = useFile(state => state.getHasChanges);
   const theme = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const fileType = useFile(state => state.format);
-  const [file, setFile] = useState<File | null>(null);
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = event.target.files?.[0];
-    if (!uploadedFile) return;
-
-    setFile(uploadedFile);
-
-    const reader = new FileReader();
-    reader.onload = async e => {
-      const binaryString = e.target?.result as string;
-      const workbook = XLSX.read(binaryString, { type: "binary" });
-      const csvData = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
-      const json = await contentToJson(csvData, FileFormat.CSV);
-
-      setContents({ contents: JSON.stringify(json, null, 2), format: FileFormat.JSON });
-    };
-    reader.readAsBinaryString(uploadedFile);
-  };
 
   React.useEffect(() => {
     monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -93,15 +71,6 @@ const TextEditor = () => {
       editor.getAction("editor.action.formatDocument")?.run();
     });
   }, []);
-
-  if (fileType === FileFormat.XLSX) {
-    return (
-      <div>
-        <input type="file" accept=".xlsx" onChange={handleFileUpload} />
-        {file && <p>Uploaded File: {file.name}</p>}
-      </div>
-    );
-  }
 
   return (
     <StyledEditorWrapper>
