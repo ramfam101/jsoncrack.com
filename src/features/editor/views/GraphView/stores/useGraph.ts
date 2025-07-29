@@ -21,6 +21,7 @@ export interface Graph {
   collapsedEdges: string[];
   collapsedParents: string[];
   selectedNode: NodeData | null;
+  selectedNodePath: string | null; // <-- Add this line
   path: string;
   aboveSupportedLimit: boolean;
 }
@@ -38,6 +39,7 @@ const initialStates: Graph = {
   collapsedEdges: [],
   collapsedParents: [],
   selectedNode: null,
+  selectedNodePath: null, // <-- Add this line
   path: "",
   aboveSupportedLimit: false,
 };
@@ -73,7 +75,11 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   clearGraph: () => set({ nodes: [], edges: [], loading: false }),
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
-  setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  setSelectedNode: nodeData =>
+    set({
+      selectedNode: nodeData,
+      selectedNodePath: nodeData?.path ?? nodeData?.id ?? null, // <-- Track path or id
+    }),
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
