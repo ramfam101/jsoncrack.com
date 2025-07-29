@@ -8,6 +8,10 @@ import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
 
+
+
+
+
 export interface Graph {
   viewPort: ViewPort | null;
   direction: CanvasDirection;
@@ -48,6 +52,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  setNodeData: (id: string, newData: any) => void; // <-- Added this line
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -74,6 +79,21 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  setNodeData: (id, newData) => {
+    set(state => {
+      const updatedNodes = state.nodes.map(node =>
+        node.id === id ? { ...node, text: newData } : node
+      );
+      const updatedSelectedNode =
+        state.selectedNode && state.selectedNode.id === id
+          ? { ...state.selectedNode, text: newData }
+          : state.selectedNode;
+      return {
+        nodes: updatedNodes,
+        selectedNode: updatedSelectedNode,
+      };
+    });
+  },
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 

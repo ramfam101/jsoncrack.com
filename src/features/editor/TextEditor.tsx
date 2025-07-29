@@ -79,11 +79,12 @@ const TextEditor = () => {
           height="100%"
           language={fileType}
           theme={theme}
+          key={contents + Math.random()} // Force re-render on content change
           value={contents}
           options={editorOptions}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
+          onChange={contents => setContents({ contents })}
           loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
