@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Flex, Popover, Text } from "@mantine/core";
 import styled from "styled-components";
 import { event as gaEvent } from "nextjs-google-analytics";
-import { BiSolidDockLeft } from "react-icons/bi";
+import { BiSolidDockLeft, BiEdit } from "react-icons/bi";
+import { VscClose } from "react-icons/vsc";
 import {
   VscCheck,
   VscError,
@@ -88,6 +89,10 @@ export const BottomBar = () => {
   const nodeCount = useGraph(state => state.nodes.length);
   const toggleFullscreen = useGraph(state => state.toggleFullscreen);
   const fullscreen = useGraph(state => state.fullscreen);
+  const editing = useFile(state => state.editing);
+  const startEditing = useFile(state => state.startEditing);
+  const cancelEditing = useFile(state => state.cancelEditing);
+  const finishEditing = useFile(state => state.finishEditing);
 
   const toggleEditor = () => {
     toggleFullscreen(!fullscreen);
@@ -144,6 +149,23 @@ export const BottomBar = () => {
       </StyledLeft>
 
       <StyledRight>
+        {!editing ? (
+          <StyledBottomBarItem onClick={startEditing}>
+            <BiEdit />
+            <Text size="xs">Edit</Text>
+          </StyledBottomBarItem>
+        ) : (
+          <>
+            <StyledBottomBarItem onClick={finishEditing}>
+              <VscCheck />
+              <Text size="xs">Save</Text>
+            </StyledBottomBarItem>
+            <StyledBottomBarItem onClick={cancelEditing}>
+              <VscClose />
+              <Text size="xs">Cancel</Text>
+            </StyledBottomBarItem>
+          </>
+        )}
         <StyledBottomBarItem>Nodes: {nodeCount}</StyledBottomBarItem>
         <Link
           href="https://github.com/AykutSarac/jsoncrack.com/discussions"

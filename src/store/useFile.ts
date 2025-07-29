@@ -41,6 +41,11 @@ type SetContents = {
 type Query = string | string[] | undefined;
 
 interface JsonActions {
+  editing: boolean;
+  editingOriginal: string;
+  startEditing: () => void;
+  cancelEditing: () => void;
+  finishEditing: () => void;
   getContents: () => string;
   getFormat: () => FileFormat;
   getHasChanges: () => boolean;
@@ -68,6 +73,9 @@ export type File = {
 };
 
 const initialStates = {
+  editing: false as boolean,
+  editingOriginal: "",
+
   fileData: null as File | null,
   format: FileFormat.JSON,
   contents: defaultJson,
@@ -174,6 +182,9 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
     if (format) set({ format });
     get().setContents({ contents, hasChanges: false });
   },
+  startEditing: () => { set({ editingOriginal: get().contents, editing: true }); },
+  cancelEditing: () => { set({ contents: get().editingOriginal, hasChanges: false, editing: false, editingOriginal: "" }); },
+  finishEditing: () => { set({ editing: false, editingOriginal: "" }); },
 }));
 
 export default useFile;

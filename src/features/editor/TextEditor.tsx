@@ -22,6 +22,8 @@ const editorOptions: EditorProps["options"] = {
 };
 
 const TextEditor = () => {
+  const editing = useFile(state => state.editing);
+
   const monaco = useMonaco();
   const contents = useFile(state => state.contents);
   const setContents = useFile(state => state.setContents);
@@ -80,7 +82,7 @@ const TextEditor = () => {
           language={fileType}
           theme={theme}
           value={contents}
-          options={editorOptions}
+          options={{ ...editorOptions, readOnly: !editing }}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
           onChange={contents => setContents({ contents, skipUpdate: true })}
