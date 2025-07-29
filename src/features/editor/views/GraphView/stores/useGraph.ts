@@ -48,6 +48,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateNode: (path: string, newData: any) => void; 
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -65,6 +66,7 @@ interface GraphActions {
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
+
   ...initialStates,
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
@@ -74,6 +76,29 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateNode: (path, newData) => {
+    set(state => {
+      const updatedNodes = state.nodes.map(node => {
+        if (node.path === path) {
+          return {
+            ...node,
+            text: newData,
+          };
+        }
+        return node;
+      });
+
+      const updatedSelectedNode =
+        state.selectedNode?.path === path
+          ? { ...state.selectedNode, text: newData }
+          : state.selectedNode;
+
+      return {
+        nodes: updatedNodes,
+        selectedNode: updatedSelectedNode,
+      };
+    });
+  },
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
