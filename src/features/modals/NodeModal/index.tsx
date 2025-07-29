@@ -3,51 +3,68 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button, Textarea, Group } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
+import { set } from "lodash";
 
 const dataToString = (data: any) => {
-  // If it's an array of entries, convert to object; otherwise, use as is
-  const safeObj = Array.isArray(data) && data.every(
-    entry => Array.isArray(entry) && entry.length === 2 && typeof entry[0] === "string"
-  )
-    ? Object.fromEntries(data)
-    : data;
-  return JSON.stringify(safeObj, null, 2);
+  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
+  const replacer = (_: string, v: string) => {
+    if (typeof v === "string") return v.replaceAll('"', "");
+    return v;
+  };
+  return JSON.stringify(text, replacer, 2);
 };
 
 
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const selectedNode = useGraph(state => state.selectedNode);
-  const nodeData = dataToString(selectedNode?.text);
+  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
   const updateSelectedNodeText = useGraph(state => state.updateSelectedNodeText);
+  const updatedContents = useFile(state => state.setContents);
+  const nodes = useGraph(state => state.nodes);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(nodeData);
 
-  // Reset edit state when modal opens/closes or node changes
   React.useEffect(() => {
     setIsEditing(false);
     setEditValue(nodeData);
   }, [opened, nodeData]);
 
+  const editClick = () => setIsEditing(true);
+  const cancelClick = () => {
+  setIsEditing(false);
+  setEditValue(nodeData);
+  }
+
   const handleSave = () => {
   try {
-    let parsed = JSON.parse(editValue);
-    // If parsed is an array of entries, convert to object
-    if (
-      Array.isArray(parsed) &&
-      parsed.every(
-        entry => Array.isArray(entry) && entry.length === 2 && typeof entry[0] === "string"
-      )
-    ) {
-      parsed = Object.fromEntries(parsed);
+    const parsed = JSON.parse(editValue);
+    const contents = useFile.getState().contents;
+    const json = JSON.parse(contents);
+    const jsonPath = path.replace(/{Root}\.?/, "").replace(/\./g, ".");
+    set(json, jsonPath, parsed);
+    updatedContents({ contents: JSON.stringify(json, null, 2), skipUpdate: true });
+    let newvalue = parsed;
+    if (typeof selectedNode?.text === "string") {
+      newvalue = JSON.stringify(parsed);
+      } 
+        else if (Array.isArray(selectedNode?.text)) {
+          newvalue = Object.entries(parsed);
+        }
+        if (selectedNode?.id) {
+        updateSelectedNodeText(selectedNode.id, newvalue);
+        setIsEditing(false);
+        } 
+        else {
+        alert("Missing Node ID");
+      }
+    } catch {
+      alert("Invalid JSON");
     }
-    updateSelectedNodeText(parsed);
-    setIsEditing(false);
-  } catch (e) {
-    alert("Invalid JSON");
-  }
 };
+
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>

@@ -62,7 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
-  updateSelectedNodeText: (newText: any) => void;
+  updateSelectedNodeText: (newText: string, text:any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -75,32 +75,26 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
-  updateSelectedNodeText: (newText) => set(state => {
-  // Always convert array of entries to object
-  const safeObj = Array.isArray(newText) && newText.every(
-    entry => Array.isArray(entry) && entry.length === 2 && typeof entry[0] === "string"
-  )
-    ? Object.fromEntries(newText)
-    : newText;
+  updateSelectedNodeText: (newText, text) => {
+    set(state => {
+      const nodes = state.nodes.map(node => {
+  if (node.id === newText) {
+    return { ...node, text };
+  }
+  return node;
+});
 
-  const { selectedNode } = state;
-  if (!selectedNode) return {};
-  const updatedNodes = state.nodes.map(node =>
-    node.id === selectedNode.id
-      ? { ...node, text: safeObj }
-      : node
-  );
-  return {
-    selectedNode: { ...selectedNode, text: safeObj },
-    nodes: updatedNodes,
-  };
-}),
+      const selectedNode = (() => {
+  if (state.selectedNode && state.selectedNode.id === newText) {
+    return { ...state.selectedNode, text };
+  }
+  return state.selectedNode;
+})();
+      return { nodes, selectedNode };
+    });
+  },
   setGraph: (data, options) => {
-  const { nodes, edges } = parser(
-    typeof data === "string"
-      ? data
-      : JSON.stringify(useJson.getState().json)
-  );
+  const { nodes, edges } = parser(data ?? useJson.getState().json);
 
   if (get().collapseAll) {
     if (nodes.length > SUPPORTED_LIMIT) {

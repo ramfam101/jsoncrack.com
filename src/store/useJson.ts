@@ -8,7 +8,7 @@ interface JsonActions {
 }
 
 const initialStates = {
-  json: {}, // Store as an object, not a string
+  json: "{}",
   loading: true,
 };
 
@@ -18,19 +18,11 @@ const useJson = create<JsonStates & JsonActions>()((set, get) => ({
   ...initialStates,
   getJson: () => get().json,
   setJson: json => {
-    let parsed = json;
-    if (typeof json === "string") {
-      try {
-        parsed = JSON.parse(json);
-      } catch {
-        parsed = {};
-      }
-    }
-    set({ json: parsed, loading: false });
-    useGraph.getState().setGraph(JSON.stringify(parsed)); // always a string
+    set({ json, loading: false });
+    useGraph.getState().setGraph(json);
   },
   clear: () => {
-    set({ json: {}, loading: false });
+    set({ json: "", loading: false });
     useGraph.getState().clearGraph();
   },
 }));
