@@ -11,6 +11,8 @@ const monaSans = localFont({
   fallback: ["Futura, Helvetica, sans-serif", "Tahoma, Verdana, sans-serif"],
 });
 
+const one = 1;
+
 const StyledLogoWrapper = styled.div`
   display: flex;
   align-items: center;
