@@ -90,6 +90,16 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     get().setGraph(updated);
 
     setContents({ contents: updated, skipUpdate: true });
+
+    const sel = get().selectedNode;
+    if (sel && sel.path === path) {
+      set({
+        selectedNode: {
+          ...sel,
+          text: newValue,       // store the raw newValue
+        },
+      });
+    }
   },
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
