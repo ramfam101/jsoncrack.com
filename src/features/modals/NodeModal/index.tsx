@@ -17,6 +17,7 @@ const dataToString = (data: any) => {
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
   const path = useGraph(state => state.selectedNode?.path || "");
+  const setNodeText = useGraph(state => state.setNodeText); // <-- Add this line if your store has a setter
 
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(nodeData);
@@ -25,6 +26,18 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     setEditValue(nodeData);
     setIsEditing(false);
   }, [nodeData]);
+
+  // Save handler
+  const handleDone = () => {
+    try {
+      // Try to parse the edited value as JSON
+      const parsed = JSON.parse(editValue);
+      setNodeText(parsed); // <-- Save to store (implement setNodeText in your store if not present)
+      setIsEditing(false);
+    } catch (e) {
+      alert("Invalid JSON");
+    }
+  };
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
@@ -44,7 +57,15 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
               <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
             )}
           </ScrollArea.Autosize>
-          <button onClick={() => setIsEditing(edit => !edit)}>
+          <button
+            onClick={() => {
+              if (isEditing) {
+                handleDone();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+          >
             {isEditing ? "Done" : "Edit"}
           </button>
         </Stack>
@@ -61,21 +82,6 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             copiedLabel="Copied to clipboard"
             withCopyButton
           />
-          <Text fz="xs" fw={500}>
-          JSON Path
-        </Text>
-        <ScrollArea.Autosize maw={600}>
-          <CodeHighlight
-            code={path}
-            miw={350}
-            mah={250}
-            language="json"
-            copyLabel="Copy to clipboard"
-            copiedLabel="Copied to clipboard"
-            withCopyButton
-          />
-        </ScrollArea.Autosize>
-        <button>Edit</button>
         </ScrollArea.Autosize>
       </Stack>
     </Modal>
