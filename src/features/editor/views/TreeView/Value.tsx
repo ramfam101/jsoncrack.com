@@ -36,7 +36,17 @@ export const Value = (props: ValueProps) => {
         }),
       }}
     >
-      <TextRenderer>{JSON.stringify(value)}</TextRenderer>
+          <TextRenderer>{JSON.stringify(value)}</TextRenderer>
+          <button style={{ marginLeft: 8 }} onClick={() => setModalOpened(true)}>
+              Edit
+          </button>
+          <NodeModal
+              opened={modalOpened}
+              onClose={() => setModalOpened(false)}
+              value={currentValue}
+              onSave={handleEdit}
+              path={path}
+          />
     </span>
   );
 };
