@@ -48,6 +48,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateSelectedNodeText: (newText: string) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -156,6 +157,36 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       collapsedNodes: get().collapsedNodes.concat(nodeIds),
       collapsedEdges: get().collapsedEdges.concat(edgeIds),
       graphCollapsed: !!get().collapsedNodes.concat(nodeIds).length,
+    });
+  },
+  updateSelectedNodeText: (newText: string) => {
+    set(state => {
+      if (!state.selectedNode) {
+        console.warn("No node selected to update text.");
+        return state;
+      }
+
+      try {
+        const parsedObject = JSON.parse(newText);
+        const newTextDataArray: [string, string][] = Object.entries(parsedObject).map(([key, value]) => [key, String(value)]);
+
+        const updatedSelectedNode = {
+          ...state.selectedNode,
+          text: newTextDataArray,
+        };
+
+        const updatedNodes = state.nodes.map(node =>
+          node.id === updatedSelectedNode.id ? updatedSelectedNode : node
+        );
+
+        return {
+          selectedNode: updatedSelectedNode,
+          nodes: updatedNodes,
+        };
+    } catch (e) {
+        console.error("Failed to parse new node text:", e);
+        return state;
+      }
     });
   },
   collapseGraph: () => {
