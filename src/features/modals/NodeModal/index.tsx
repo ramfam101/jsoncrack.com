@@ -33,6 +33,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const handleDone = () => {
     try {
       const parsed = JSON.parse(editValue);
+      const formatted = JSON.stringify(parsed, null, 2);
       setNodeText(parsed);
 
       // Update the main JSON in useFile

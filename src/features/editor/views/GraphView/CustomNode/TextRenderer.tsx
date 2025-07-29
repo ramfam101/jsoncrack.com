@@ -31,28 +31,13 @@ const Linkify = (text: string) => {
 };
 
 interface TextRendererProps {
-  children: any;
+  children: String;
 }
 
 export const TextRenderer = ({ children }: TextRendererProps) => {
   const text = children?.replaceAll('"', "");
 
   if (isURL(text)) return Linkify(text);
-
-  if (typeof children === "object" && children !== null) {
-    return (
-      <div>
-        {Object.entries(children).map(([key, value]) => (
-          <div key={key}>
-            <span style={{ color: "#66d9ef" }}>{key}:</span>{" "}
-            <span style={{ color: typeof value === "number" ? "#e6db74" : "#f8f8f2" }}>
-              {JSON.stringify(value)}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   if (isColorFormat(text)) {
     return (
