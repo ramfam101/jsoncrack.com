@@ -34,13 +34,13 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     try {
       const parsed = JSON.parse(editValue);
       const formatted = JSON.stringify(parsed, null, 2);
-      setNodeText(parsed);
+      setNodeText(formatted);
 
       // Update the main JSON in useFile
       const fileJson = JSON.parse(useFile.getState().contents);
       // If your node path is a top-level key (like "fruit"), update it:
       if (path && fileJson[path]) {
-        fileJson[path] = parsed;
+        fileJson[path] = formatted;
         useFile.getState().setContents({ contents: JSON.stringify(fileJson, null, 2) });
       }
       setIsEditing(false);
