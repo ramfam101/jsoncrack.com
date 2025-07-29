@@ -9,6 +9,8 @@ import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
 
 export interface Graph {
+  // add updateNodeData
+  updateNodeData: (nodeId: string, data: Partial<NodeData>) => void;
   viewPort: ViewPort | null;
   direction: CanvasDirection;
   loading: boolean;
@@ -26,6 +28,7 @@ export interface Graph {
 }
 
 const initialStates: Graph = {
+  updateNodeData: () => {},
   viewPort: null,
   direction: "RIGHT",
   loading: true,
@@ -233,6 +236,20 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
-}));
 
+  // Function to update node data
+
+  updateNodeData: (nodeId, data) => {
+    set(state => ({
+      nodes: state.nodes.map(node =>
+        node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
+      ),
+      // Optionally update selectedNode if it's the one being edited
+      selectedNode:
+        state.selectedNode && state.selectedNode.id === nodeId
+          ? { ...state.selectedNode, data: { ...state.selectedNode.data, ...data } }
+          : state.selectedNode,
+    }));
+  },
+}));
 export default useGraph;
