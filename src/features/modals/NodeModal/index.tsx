@@ -25,7 +25,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     setEditValue(nodeData);
     setIsEditing(false);
   }, [nodeData]);
-  
+
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
@@ -34,8 +34,19 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             Content
           </Text>
           <ScrollArea.Autosize mah={250} maw={600}>
-            <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+            {isEditing ? (
+              <textarea
+                style={{ width: "100%", minHeight: 150, fontFamily: "monospace" }}
+                value={editValue}
+                onChange={e => setEditValue(e.target.value)}
+              />
+            ) : (
+              <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+            )}
           </ScrollArea.Autosize>
+          <button onClick={() => setIsEditing(edit => !edit)}>
+            {isEditing ? "Done" : "Edit"}
+          </button>
         </Stack>
         <Text fz="xs" fw={500}>
           JSON Path
