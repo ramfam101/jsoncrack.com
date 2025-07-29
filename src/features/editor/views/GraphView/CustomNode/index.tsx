@@ -61,6 +61,7 @@ const CustomNodeWrapper = (nodeProps: NodeProps<NodeData["data"]>) => {
           ) : (
             <TextNode node={node as NodeData} hasCollapse={!!data?.childrenCount} x={x} y={y} />
           )}
+          
         </g>
       )}
     </Node>

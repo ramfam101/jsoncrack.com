@@ -1,6 +1,8 @@
 import React from "react";
+import { CodeHighlight } from "@mantine/code-highlight";
 import { useSessionStorage } from "@mantine/hooks";
 import styled from "styled-components";
+import useGraph from "./views/GraphView/stores/useGraph";
 import { ViewMode } from "../../enums/viewMode.enum";
 import { GraphView } from "./views/GraphView";
 import { TreeView } from "./views/TreeView";
@@ -28,6 +30,20 @@ const StyledLiveEditor = styled.div`
   }
 `;
 
+function nodesToJson(nodes: any[]) {
+  // Example implementation: reconstructs a simple object from nodes with key/value pairs
+  // You may need to adjust this based on your actual node structure
+  const result: Record<string, any> = {};
+  nodes.forEach(node => {
+    if (node.data && node.data.key) {
+      result[node.data.key] = node.text;
+    } else if (node.id && node.text) {
+      result[node.id] = node.text;
+    }
+  });
+  return result;
+}
+
 const View = () => {
   const [viewMode] = useSessionStorage({
     key: "viewMode",
@@ -40,9 +56,13 @@ const View = () => {
 };
 
 const LiveEditor = () => {
+  const nodes = useGraph(state => state.nodes);
+  const json = nodesToJson(nodes);
+
   return (
     <StyledLiveEditor onContextMenuCapture={e => e.preventDefault()}>
       <View />
+      <CodeHighlight code={JSON.stringify(json, null, 2)} language="json" />
     </StyledLiveEditor>
   );
 };
