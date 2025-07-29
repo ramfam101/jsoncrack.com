@@ -118,6 +118,18 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
       console.warn("The content was unable to be converted, so it was cleared instead.");
     }
   },
+
+  setGraphFromContents: async () => {
+  try {
+    const json = await contentToJson(get().contents, get().format);
+    // This assumes your parser expects a JSON object and returns nodes/edges
+    const { nodes, edges } = require("../features/editor/views/GraphView/lib/jsonParser").parser(JSON.stringify(json));
+    useGraph.getState().setGraph(JSON.stringify(json));
+  } catch (error: any) {
+    set({ error: error?.message || "Failed to update graph from contents." });
+  }
+},
+
   setContents: async ({ contents, hasChanges = true, skipUpdate = false, format }) => {
     try {
       set({

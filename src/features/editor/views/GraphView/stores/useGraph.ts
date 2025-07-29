@@ -44,6 +44,7 @@ const initialStates: Graph = {
 
 interface GraphActions {
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
+  
   setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
@@ -62,6 +63,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (id: string, newText: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -204,6 +206,18 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       graphCollapsed: false,
     });
   },
+
+  updateNode: (id: string, newText: any) => {
+  set((state) => ({
+    nodes: state.nodes.map((node) =>
+      node.id === id ? { ...node, text: newText } : node
+    ),
+    selectedNode:
+      state.selectedNode && state.selectedNode.id === id
+        ? { ...state.selectedNode, text: newText }
+        : state.selectedNode,
+  }));
+},
   focusFirstNode: () => {
     const rootNode = document.querySelector("g[id*='node-1']");
     get().viewPort?.camera?.centerFitElementIntoView(rootNode as HTMLElement, {
