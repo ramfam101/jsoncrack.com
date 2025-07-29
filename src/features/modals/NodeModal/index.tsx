@@ -33,12 +33,11 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   const handleDone = () => {
     try {
       const parsed = JSON.parse(editValue);
-      const formatted = JSON.stringify(parsed); // Save as string
-      setNodeText(formatted);
+      setNodeText(parsed); // Save as object
 
       const fileJson = JSON.parse(useFile.getState().contents);
       if (path && fileJson[path]) {
-        fileJson[path] = formatted;
+        fileJson[path] = parsed; // Save as object
         useFile.getState().setContents({ contents: JSON.stringify(fileJson, null, 2) });
       }
       setIsEditing(false);
