@@ -3,6 +3,7 @@ import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
 import { create } from "zustand";
 import { SUPPORTED_LIMIT } from "../../../../../constants/graph";
 import useJson from "../../../../../store/useJson";
+import useFile from "../../../../../store/useFile";
 import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
@@ -57,6 +58,7 @@ interface GraphActions {
   getCollapsedEdgeIds: () => string[];
   toggleFullscreen: (value: boolean) => void;
   toggleCollapseAll: (value: boolean) => void;
+  updateNode: (path: string, newValue: any) => void;
   zoomIn: () => void;
   zoomOut: () => void;
   centerView: () => void;
@@ -66,6 +68,39 @@ interface GraphActions {
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
+  updateNode: (path: string, newValue: any) => {
+    const { contents: currentContents, setContents } = useFile.getState();
+    const doc = JSON.parse(currentContents);
+
+    const keys = path.replace(/^\{Root\}\./, "").split(".");
+
+    let parent: any = doc;
+    for (let i = 0; i < keys.length - 1; i++) {
+      parent = parent[keys[i]];
+      if (parent == null) {
+        console.warn(`Invalid path: ${path}`);
+        return;
+      }
+    }
+
+    parent[keys[keys.length - 1]] = newValue;
+
+    const updated = JSON.stringify(doc, null, 2);
+
+    get().setGraph(updated);
+
+    setContents({ contents: updated, skipUpdate: true });
+
+    const sel = get().selectedNode;
+    if (sel && sel.path === path) {
+      set({
+        selectedNode: {
+          ...sel,
+          text: newValue,       // store the raw newValue
+        },
+      });
+    }
+  },
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
     get().collapseGraph();

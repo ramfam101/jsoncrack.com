@@ -100,7 +100,7 @@ const EditorPage = () => {
                     preferredSize={450}
                     minSize={fullscreen ? 0 : 300}
                     maxSize={800}
-                    visible={!fullscreen}
+                    // visible={!fullscreen}
                   >
                     <TextEditor />
                   </Allotment.Pane>
