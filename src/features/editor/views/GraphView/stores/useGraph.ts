@@ -74,7 +74,10 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   clearGraph: () => set({ nodes: [], edges: [], loading: false }),
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
-  setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  setSelectedNode: nodeData => set({ 
+    selectedNode: nodeData, 
+    path: nodeData.path || "" // <-- Ensure path is set from the node
+  }),
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
