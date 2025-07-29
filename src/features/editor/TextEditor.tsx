@@ -36,11 +36,11 @@ const TextEditor = () => {
   // Removed: const setGraphFromContents = useFile(state => state.setGraphFromContents);
   const selectedNode = useGraph(state => state.selectedNode);
 
-  // React.useEffect(() => {
-  //   if (selectedNode?.text) {
-  //     setContents({ contents: JSON.stringify(selectedNode.text, null, 2), skipUpdate: true });
-  //   }
-  // }, [selectedNode]);
+  React.useEffect(() => {
+    if (selectedNode?.text) {
+      setContents({ contents: JSON.stringify(selectedNode.text, null, 2), skipUpdate: true });
+    }
+  }, [selectedNode]);
 
   React.useEffect(() => {
     monaco?.languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -70,7 +70,7 @@ const TextEditor = () => {
       }
     };
 
-    // Removed: const setGraphFromContents = useFile(state => state.setGraphFromContents);
+
 
     window.addEventListener("beforeunload", beforeunload);
 
@@ -85,10 +85,15 @@ const TextEditor = () => {
     });
   }, []);
 
-  function setGraphFromContents() {
-    throw new Error("Function not implemented.");
-  }
+const setGraph = useGraph(state => state.setGraph);
 
+function setGraphFromContents() {
+  try {
+    setGraph(contents); // You may need to validate here
+  } catch (e) {
+    console.error("Failed to set graph from contents", e);
+  }
+}
   return (
     <StyledEditorWrapper>
       <StyledWrapper>

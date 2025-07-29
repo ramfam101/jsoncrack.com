@@ -4,6 +4,8 @@ import { Modal, Stack, Text, ScrollArea, Button, Textarea, Group } from "@mantin
 import { useState } from "react";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
+
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -22,6 +24,7 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedValue, setEditedValue] = useState(nodeData);
+  const setContents = useFile(state => state.setContents); // Inside the component
 
   const updateNode = useGraph(state => state.updateNode);
 
@@ -30,19 +33,20 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
     setIsEditing(false);
   }, [nodeData, opened]);
 
-  const handleSave = () => {
-    try {
-      const parsed = JSON.parse(editedValue);
-      if (selectedNode?.id) {
-        updateNode(selectedNode.id, parsed);
-      } else {
-        alert("Node ID is missing.");
-      }
-      setIsEditing(false);
-    } catch (e) {
-      alert("Invalid JSON");
+const handleSave = () => {
+  try {
+    const parsed = JSON.parse(editedValue);
+    if (selectedNode?.id) {
+      updateNode(selectedNode.id, parsed);
+      setContents({ contents: JSON.stringify(parsed, null, 2), skipUpdate: true }); // Sync editor
+    } else {
+      alert("Node ID is missing.");
     }
-  };
+    setIsEditing(false);
+  } catch (e) {
+    alert("Invalid JSON");
+  }
+};
   
 
   return (
