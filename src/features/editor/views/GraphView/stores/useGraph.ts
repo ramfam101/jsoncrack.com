@@ -8,6 +8,8 @@ import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
 
+
+
 export interface Graph {
   viewPort: ViewPort | null;
   direction: CanvasDirection;
@@ -62,6 +64,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  setText: (id: string, text: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +236,16 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  setText: (id: string, text: any) => {
+    set(state => ({
+      nodes: state.nodes.map(node =>
+        node.id === id ? { ...node, text } : node
+      ),
+      selectedNode: state.selectedNode && state.selectedNode.id === id
+        ? { ...state.selectedNode, text }
+        : state.selectedNode
+    }));
+  },
 }));
 
 export default useGraph;

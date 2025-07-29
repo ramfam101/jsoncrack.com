@@ -53,6 +53,7 @@ interface JsonActions {
   setFile: (fileData: File) => void;
   setJsonSchema: (jsonSchema: object | null) => void;
   checkEditorSession: (url: Query, widget?: boolean) => void;
+  setText: (path: string, value: any) => void;
 }
 
 export type File = {
@@ -174,6 +175,47 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
     if (format) set({ format });
     get().setContents({ contents, hasChanges: false });
   },
+  setText: (path: string, value: any) => {
+  try {
+    // Remove '{Root}' or '{Root}.' prefix if present
+    const cleanedPath = path.replace(/^\{Root\}\.?/, "");
+
+    // Parse current JSON contents
+    const json = JSON.parse(get().contents);
+    const keys = cleanedPath.split(".");
+    let obj = json;
+
+    // Traverse to the correct location
+    for (let i = 0; i < keys.length - 1; i++) {
+      const key = keys[i];
+      const idx = Number(key);
+      if (!isNaN(idx) && key.trim() !== "" && Array.isArray(obj)) {
+        obj = obj[idx];
+      } else {
+        obj = obj[key];
+      }
+      if (obj === undefined || obj === null) {
+        console.warn("Invalid path during setText traversal at key:", keys[i]);
+        return;
+      }
+    }
+
+    // Set the new value at the last key
+    const lastKey = keys[keys.length - 1];
+    const lastIdx = Number(lastKey);
+    if (!isNaN(lastIdx) && lastKey.trim() !== "" && Array.isArray(obj)) {
+      obj[lastIdx] = value;
+    } else {
+      obj[lastKey] = value;
+    }
+
+    // Update the file contents with pretty formatting
+    const newContents = JSON.stringify(json, null, 2);
+    get().setContents({ contents: newContents, hasChanges: true });
+  } catch (err) {
+    set({ error: "Failed to update value at path: " + path });
+  }
+}
 }));
 
 export default useFile;
