@@ -7,12 +7,23 @@ import { Value } from "./Value";
 
 export const TreeView = () => {
   const theme = useTheme();
-  const json = useJson(state => state.json);
+  const { json, json_version } = useJson(state => ({
+    json: state.json,
+    json_version: state.json_version,
+  }));
+
+  let parsed: any = {};
+  try {
+    parsed = JSON.parse(json); // safe parse
+  } catch {
+    parsed = {}; // fallback
+  }
 
   return (
     <JSONTree
+      key={json_version} // ✅ Force re-render on each setJson()
       hideRoot
-      data={JSON.parse(json)}
+      data={parsed}
       valueRenderer={(valueAsString, value) => <Value {...{ valueAsString, value }} />}
       labelRenderer={(keyPath, nodeType) => <Label {...{ keyPath, nodeType }} />}
       theme={{
