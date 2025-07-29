@@ -17,7 +17,7 @@ export interface Graph {
   collapseAll: boolean;
   nodes: NodeData[];
   edges: EdgeData[];
-  collapsedNodes: string[];
+  collapsedNodes: string[]; 
   collapsedEdges: string[];
   collapsedParents: string[];
   selectedNode: NodeData | null;
@@ -50,6 +50,7 @@ interface GraphActions {
   setSelectedNode: (nodeData: NodeData) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
+  updateSelectedNode: (nodeID: string, newText: string | [string, string][]) => void;
   expandGraph: () => void;
   collapseNodes: (nodeId: string) => void;
   collapseGraph: () => void;
@@ -158,6 +159,27 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       graphCollapsed: !!get().collapsedNodes.concat(nodeIds).length,
     });
   },
+  updateSelectedNode: (targetId, newContent) => {
+  const { nodes: allNodes, selectedNode: activeNode } = get();
+
+  if (!activeNode) return;
+
+  const newNodeList = allNodes.map(item =>
+    item.id === targetId
+      ? { ...item, text: newContent }
+      : item
+  );
+
+  const updatedSelection =
+    activeNode.id === targetId
+      ? { ...activeNode, text: newContent }
+      : activeNode;
+
+  set({
+    nodes: newNodeList,
+    selectedNode: updatedSelection,
+  });
+},
   collapseGraph: () => {
     const edges = get().edges;
     const tos = edges.map(edge => edge.to);
