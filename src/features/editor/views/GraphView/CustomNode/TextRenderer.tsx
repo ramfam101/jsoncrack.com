@@ -31,10 +31,34 @@ const Linkify = (text: string) => {
 };
 
 interface TextRendererProps {
-  children: String;
+  children: string;
 }
 
 export const TextRenderer = ({ children }: TextRendererProps) => {
+  let parsed: any = null;
+  try {
+    parsed = JSON.parse(children);
+  } catch {
+    parsed = null;
+  }
+
+  // If the string is valid JSON, display key-value pairs
+  if (parsed && typeof parsed === "object") {
+    return (
+      <div>
+        {Object.entries(parsed).map(([key, value]) => (
+          <div key={key}>
+            <span style={{ color: "#66d9ef" }}>{key}:</span>{" "}
+            <span style={{ color: typeof value === "number" ? "#e6db74" : "#f8f8f2" }}>
+              {JSON.stringify(value)}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Otherwise, fallback to your original rendering
   const text = children?.replaceAll('"', "");
 
   if (isURL(text)) return Linkify(text);
