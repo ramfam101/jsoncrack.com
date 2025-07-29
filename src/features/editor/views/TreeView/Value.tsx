@@ -39,7 +39,7 @@ export const Value = (props: ValueProps) => {
         }),
       }}
     >
-      <TextRenderer>{JSON.stringify(value)}</TextRenderer>
+      <TextRenderer>{displayValue}</TextRenderer>
     </span>
   );
 };
