@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateSelectedNodeText: (newText: string, text:any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -74,40 +75,58 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  updateSelectedNodeText: (newText, text) => {
+    set(state => {
+      const nodes = state.nodes.map(node => {
+  if (node.id === newText) {
+    return { ...node, text };
+  }
+  return node;
+});
+
+      const selectedNode = (() => {
+  if (state.selectedNode && state.selectedNode.id === newText) {
+    return { ...state.selectedNode, text };
+  }
+  return state.selectedNode;
+})();
+      return { nodes, selectedNode };
+    });
+  },
   setGraph: (data, options) => {
-    const { nodes, edges } = parser(data ?? useJson.getState().json);
+  const { nodes, edges } = parser(data ?? useJson.getState().json);
 
-    if (get().collapseAll) {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({ aboveSupportedLimit: true, ...options, loading: false });
-      }
+  if (get().collapseAll) {
+    if (nodes.length > SUPPORTED_LIMIT) {
+      return set({ aboveSupportedLimit: true, ...options, loading: false });
+    }
 
-      set({ nodes, edges, aboveSupportedLimit: false, ...options });
-      get().collapseGraph();
-    } else {
-      if (nodes.length > SUPPORTED_LIMIT) {
-        return set({
-          aboveSupportedLimit: true,
-          collapsedParents: [],
-          collapsedNodes: [],
-          collapsedEdges: [],
-          ...options,
-          loading: false,
-        });
-      }
-
-      set({
-        nodes,
-        edges,
+    set({ nodes, edges, aboveSupportedLimit: false, ...options });
+    get().collapseGraph();
+  } else {
+    if (nodes.length > SUPPORTED_LIMIT) {
+      return set({
+        aboveSupportedLimit: true,
         collapsedParents: [],
         collapsedNodes: [],
         collapsedEdges: [],
-        graphCollapsed: false,
-        aboveSupportedLimit: false,
         ...options,
+        loading: false,
       });
     }
-  },
+
+    set({
+      nodes,
+      edges,
+      collapsedParents: [],
+      collapsedNodes: [],
+      collapsedEdges: [],
+      graphCollapsed: false,
+      aboveSupportedLimit: false,
+      ...options,
+    });
+  }
+},
   setDirection: (direction = "RIGHT") => {
     set({ direction });
     setTimeout(() => get().centerView(), 200);
@@ -178,7 +197,7 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       .map(node => node.id);
 
     const closestParentToRoot = Math.min(...collapsedParents.map(n => +n));
-    const focusNodeId = `g[id*='node-${closestParentToRoot}']`;
+    const focusNodeId = g[id*='node-${closestParentToRoot}'];
     const rootNode = document.querySelector(focusNodeId);
 
     set({

@@ -118,32 +118,14 @@ const useFile = create<FileStates & JsonActions>()((set, get) => ({
       console.warn("The content was unable to be converted, so it was cleared instead.");
     }
   },
-  setContents: async ({ contents, hasChanges = true, skipUpdate = false, format }) => {
-    try {
-      set({
-        ...(contents && { contents }),
-        error: null,
-        hasChanges,
-        format: format ?? get().format,
-      });
+  setContents: ({ contents, skipUpdate }) => {
+    set({ contents });
+    if (!skipUpdate) {
+      try {
+        const parsed = JSON.parse(contents ?? "");
+        useGraph.getState().setGraph(JSON.stringify(parsed));
+      }catch{}
 
-      const isFetchURL = window.location.href.includes("?");
-      const json = await contentToJson(get().contents, get().format);
-
-      if (!useConfig.getState().liveTransformEnabled && skipUpdate) return;
-
-      if (get().hasChanges && contents && contents.length < 80_000 && !isIframe() && !isFetchURL) {
-        sessionStorage.setItem("content", contents);
-        sessionStorage.setItem("format", get().format);
-        set({ hasChanges: true });
-      }
-
-      debouncedUpdateJson(json);
-    } catch (error: any) {
-      if (error?.mark?.snippet) return set({ error: error.mark.snippet });
-      if (error?.message) set({ error: error.message });
-      useJson.setState({ loading: false });
-      useGraph.setState({ loading: false });
     }
   },
   setError: error => set({ error }),
