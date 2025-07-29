@@ -43,6 +43,20 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
             withCopyButton
           />
         </ScrollArea.Autosize>
+        {/* Test Save Button */}
+        <button
+          style={{ marginTop: 16 }}
+          onClick={() => alert("Button clicked!")}
+        >
+          Save
+        </button>
+        {/* Test Save Button */}
+        <button
+          style={{ marginTop: 16 }}
+          onClick={() => alert("Button clicked!")}
+        >
+          Cancel
+        </button>
       </Stack>
     </Modal>
   );

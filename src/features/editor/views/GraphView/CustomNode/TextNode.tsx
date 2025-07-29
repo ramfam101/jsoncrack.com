@@ -107,6 +107,16 @@ const Node = ({ node, x, y, hasCollapse = false }: CustomNodeProps) => {
           {isParent && hasCollapse && collapseButtonVisible && (
             <StyledExpand aria-label="Expand" onClick={handleExpand}>
               {isExpanded ? <MdLinkOff size={18} /> : <MdLink size={18} />}
+              {/* Your custom button */}
+          <button
+            style={{ marginLeft: 8 }}
+            onClick={e => {
+              e.stopPropagation();
+              alert(`Button clicked for node ${id}`);
+            }}
+          >
+            Action
+          </button>
             </StyledExpand>
           )}
         </StyledTextNodeWrapper>
