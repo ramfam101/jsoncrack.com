@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  refreshSelectedNode: () => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -74,6 +75,10 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  refreshSelectedNode: () => {
+  const current = get().selectedNode;
+  set({ selectedNode: current ? { ...current } : null });
+  },
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
