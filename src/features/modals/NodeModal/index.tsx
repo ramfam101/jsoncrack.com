@@ -71,16 +71,25 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
 
   return (
     <Modal
-      title={
-        <Group justify="space-between">
-          <Text>Node Content</Text>
-          {!editing ? (
-            <Button size="xs" onClick={() => setEditing(true)}>Edit</Button>
-          ) : (
-            <Button size="xs" color="green" onClick={handleSave}>Save</Button>
-          )}
-        </Group>
-      }
+title={
+  <Group justify="space-between" align="center" style={{ width: "100%" }}>
+    <Text fw={500}>Node Content</Text>
+    {!editing ? (
+      <Button size="xs" onClick={() => setEditing(true)}>
+        Edit
+      </Button>
+    ) : (
+      <Group gap="xs">
+        <Button size="xs" color="green" onClick={handleSave}>
+          Save
+        </Button>
+        <Button size="xs" color="red" variant="light" onClick={() => setEditing(false)}>
+          Cancel
+        </Button>
+      </Group>
+    )}
+  </Group>
+}
       size="auto"
       opened={opened}
       onClose={onClose}
