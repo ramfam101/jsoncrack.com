@@ -72,6 +72,15 @@ const TextEditor = () => {
     });
   }, []);
 
+  const debounce = React.useRef<Node.JS.Timeout | null>(null);
+
+  const handleChange = useCallback((contents: string | undefined) => {
+      if (debounce.current) clearTimeout(debounce.current);
+      debounce.current = setTimeout(() => {
+          setContents ({ contents, skipUpdate: true });
+          }, 250);
+      }, [setContents]);
+
   return (
     <StyledEditorWrapper>
       <StyledWrapper>
@@ -83,7 +92,7 @@ const TextEditor = () => {
           options={editorOptions}
           onMount={handleMount}
           onValidate={errors => setError(errors[0]?.message)}
-          onChange={contents => setContents({ contents, skipUpdate: true })}
+          onChange={handleChange}
           loading={<LoadingOverlay visible />}
         />
       </StyledWrapper>
