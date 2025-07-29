@@ -3,6 +3,8 @@ import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
+import useFile from "../../../store/useFile";
+
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -30,9 +32,16 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
   // Save handler
   const handleDone = () => {
     try {
-      // Try to parse the edited value as JSON
       const parsed = JSON.parse(editValue);
-      setNodeText(parsed); // <-- Save to store (implement setNodeText in your store if not present)
+      setNodeText(parsed);
+
+      // Update the main JSON in useFile
+      const fileJson = JSON.parse(useFile.getState().contents);
+      // If your node path is a top-level key (like "fruit"), update it:
+      if (path && fileJson[path]) {
+        fileJson[path] = parsed;
+        useFile.getState().setContents({ contents: JSON.stringify(fileJson, null, 2) });
+      }
       setIsEditing(false);
     } catch (e) {
       alert("Invalid JSON");
