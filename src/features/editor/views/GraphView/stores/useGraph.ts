@@ -7,6 +7,7 @@ import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
 import { getOutgoers } from "../lib/utils/getOutgoers";
+import { getNodePath } from "../lib/utils/getNodePath"; // Make sure this import exists
 
 export interface Graph {
   viewPort: ViewPort | null;
@@ -62,6 +63,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (node: NodeData, newValue: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,28 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateNode: (node, newValue) => {
+    set(state => {
+      const nodes = state.nodes.map(n =>
+        n.id === node.id ? { ...n, text: newValue } : n
+      );
+
+      // Recalculate path for the updated node
+      const updatedNode = nodes.find(n => n.id === node.id);
+      let updatedPath = state.selectedNode?.path;
+      if (updatedNode) {
+        updatedPath = getNodePath(nodes, state.edges, String(updatedNode.id));
+      }
+
+      // Update selectedNode if it's the one being edited
+      const selectedNode =
+        state.selectedNode && state.selectedNode.id === node.id
+          ? { ...state.selectedNode, text: newValue, path: updatedPath }
+          : state.selectedNode;
+
+      return { ...state, nodes, selectedNode };
+    });
+  },
 }));
 
 export default useGraph;
