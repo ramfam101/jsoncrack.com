@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeText: (path: string, newText: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
