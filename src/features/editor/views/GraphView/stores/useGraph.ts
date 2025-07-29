@@ -48,6 +48,7 @@ interface GraphActions {
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
+  updateSelectedNode: (newText: string) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
   expandGraph: () => void;
@@ -233,6 +234,40 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateSelectedNode: newText => set(state => {
+    if (!state.selectedNode) return {};
+
+    // Parse the new text
+    let updatedText = JSON.parse(newText);
+
+    // If the node is an object, convert to [key, value][] format
+    if (
+      state.selectedNode.data?.type === "object" &&
+      updatedText &&
+      typeof updatedText === "object" &&
+      !Array.isArray(updatedText)
+    ) {
+      updatedText = Object.entries(updatedText);
+    }
+
+    // If the node is an array, ensure it's an array
+    if (state.selectedNode.data?.type === "array" && Array.isArray(updatedText)) {
+      // You may want to format array items if needed
+    }
+
+    const updatedSelectedNode = { ...state.selectedNode, text: updatedText };
+
+    const updatedNodes = state.nodes.map(node =>
+      node.id === state.selectedNode!.id
+        ? { ...node, text: updatedText }
+        : node
+    );
+
+    return {
+      selectedNode: updatedSelectedNode,
+      nodes: updatedNodes,
+    };
+  }),
 }));
 
 export default useGraph;
