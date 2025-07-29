@@ -108,6 +108,15 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       });
     }
   },
+  updateNodeText: (id: string, newText: string) =>
+    set(state => ({
+      nodes: state.nodes.map(node => (node.id === id ? { ...node, text: newText } : node)),
+      // Optionally update selectedNode if it's the one being edited
+      selectedNode:
+        state.selectedNode && state.selectedNode.id === id
+          ? { ...state.selectedNode, text: newText }
+          : state.selectedNode,
+    })),
   setDirection: (direction = "RIGHT") => {
     set({ direction });
     setTimeout(() => get().centerView(), 200);

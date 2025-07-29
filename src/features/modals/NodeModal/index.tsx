@@ -1,32 +1,75 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
-import { Modal, Stack, Text, ScrollArea } from "@mantine/core";
+import { Modal, Stack, Text, ScrollArea, Button, Textarea, Group } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 
-const dataToString = (data: any) => {
-  const text = Array.isArray(data) ? Object.fromEntries(data) : data;
-  const replacer = (_: string, v: string) => {
-    if (typeof v === "string") return v.replaceAll('"', "");
-    return v;
-  };
-
-  return JSON.stringify(text, replacer, 2);
-};
-
 export const NodeModal = ({ opened, onClose }: ModalProps) => {
-  const nodeData = useGraph(state => dataToString(state.selectedNode?.text));
+  const selectedNode = useGraph(state => state.selectedNode);
   const path = useGraph(state => state.selectedNode?.path || "");
+  const updateNodeText = useGraph(state => state.updateNodeText);
+
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState("");
+
+  useEffect(() => {
+    setEditValue(selectedNode?.text ? JSON.stringify(selectedNode.text, null, 2) : "");
+    setEditing(false);
+  }, [selectedNode]);
+
+  const handleSave = () => {
+    if (selectedNode && updateNodeText) {
+      try {
+        const parsed = JSON.parse(editValue);
+        updateNodeText(selectedNode.id, parsed);
+        setEditing(false);
+      } catch (e) {
+        alert("Invalid JSON format.");
+      }
+    }
+  };
 
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
+        <Group position="right">
+          {editing ? (
+            <>
+              <Button size="xs" variant="light" onClick={handleSave}>
+                Save
+              </Button>
+              <Button size="xs" variant="default" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button onClick={() => setEditing(true)} size="xs" variant="light">
+              Edit
+            </Button>
+          )}
+        </Group>
         <Stack gap="xs">
           <Text fz="xs" fw={500}>
             Content
           </Text>
           <ScrollArea.Autosize mah={250} maw={600}>
-            <CodeHighlight code={nodeData} miw={350} maw={600} language="json" withCopyButton />
+            {editing ? (
+              <Textarea
+                value={editValue}
+                onChange={e => setEditValue(e.currentTarget.value)}
+                minRows={6}
+                autosize
+                style={{ minWidth: 350, maxWidth: 600 }}
+              />
+            ) : (
+              <CodeHighlight
+                code={selectedNode?.text ? JSON.stringify(selectedNode.text, null, 2) : ""}
+                miw={350}
+                maw={600}
+                language="json"
+                withCopyButton
+              />
+            )}
           </ScrollArea.Autosize>
         </Stack>
         <Text fz="xs" fw={500}>
