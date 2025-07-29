@@ -62,6 +62,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (path: string, content: any) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -112,6 +113,24 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     set({ direction });
     setTimeout(() => get().centerView(), 200);
   },
+  updateNode: (path, content) => {
+    set(state => {
+      if (!state.selectedNode) return {};
+      const updatedNodes = state.selectedNode
+        ? state.nodes.map(node =>
+            node.id === state.selectedNode!.id
+              ? { ...node, text: content }
+              : node
+          )
+        : state.nodes;
+      return {
+        nodes: updatedNodes,
+        selectedNode: { ...state.selectedNode, text: content }
+      };
+    });
+  },
+
+  
   setLoading: loading => set({ loading }),
   expandNodes: nodeId => {
     const [childrenNodes, matchingNodes] = getOutgoers(
