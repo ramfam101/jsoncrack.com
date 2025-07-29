@@ -27,6 +27,9 @@ export const Value = (props: ValueProps) => {
   const theme = useTheme();
   const { valueAsString, value } = props;
 
+  const displayValue =
+    typeof value === "string" ? value : JSON.stringify(value);
+
   return (
     <span
       style={{
