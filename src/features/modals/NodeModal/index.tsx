@@ -43,12 +43,13 @@ export const NodeModal = ({ opened, onClose }: ModalProps) => {
         height: selectedNode?.height ?? 0,
         text: newText,
         data: selectedNode?.data ?? {
-          type: "object", // Use your default NodeType here
+          type: "object",
           isParent: false,
           isEmpty: false,
           childrenCount: 0,
         },
       });
+      useGraph.getState().setGraph(JSON.stringify(newText, null, 2)); // Update graph after save
       setIsEditing(false);
       onClose?.();
     } catch (error) {
