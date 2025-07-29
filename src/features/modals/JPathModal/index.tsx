@@ -5,12 +5,12 @@ import { JSONPath } from "jsonpath-plus";
 import { event as gaEvent } from "nextjs-google-analytics";
 import toast from "react-hot-toast";
 import { VscLinkExternal } from "react-icons/vsc";
-import useFile from "../../../store/useFile";
+import { useFile } from "../../../store/useFile";
 import useJson from "../../../store/useJson";
 
 export const JPathModal = ({ opened, onClose }: ModalProps) => {
   const getJson = useJson(state => state.getJson);
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
   const [query, setQuery] = React.useState("");
 
   const evaluteJsonPath = () => {
@@ -18,7 +18,7 @@ export const JPathModal = ({ opened, onClose }: ModalProps) => {
       const json = getJson();
       const result = JSONPath({ path: query, json: JSON.parse(json) });
 
-      setContents({ contents: JSON.stringify(result, null, 2) });
+      updateFileContent({ contents: JSON.stringify(result, null, 2) });
       gaEvent("run_json_path");
       onClose();
     } catch (error) {

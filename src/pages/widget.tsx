@@ -7,7 +7,7 @@ import { NextSeo } from "next-seo";
 import toast from "react-hot-toast";
 import { darkTheme, lightTheme } from "../constants/theme";
 import useGraph from "../features/editor/views/GraphView/stores/useGraph";
-import useFile from "../store/useFile";
+import { useFile } from "../store/useFile";
 import type { LayoutDirection } from "../types/graph";
 
 interface EmbedMessage {
@@ -36,7 +36,7 @@ const WidgetPage = () => {
   const { setColorScheme } = useMantineColorScheme();
   const [theme, setTheme] = React.useState<"dark" | "light">("dark");
   const checkEditorSession = useFile(state => state.checkEditorSession);
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
   const setDirection = useGraph(state => state.setDirection);
   const clearGraph = useGraph(state => state.clearGraph);
 
@@ -57,7 +57,7 @@ const WidgetPage = () => {
           setTheme(event.data.options.theme);
         }
 
-        setContents({ contents: event.data.json, hasChanges: false });
+        updateFileContent({ contents: event.data.json, hasChanges: false });
         setDirection(event.data.options?.direction || "RIGHT");
       } catch (error) {
         console.error(error);
@@ -67,7 +67,7 @@ const WidgetPage = () => {
 
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
-  }, [setColorScheme, setContents, setDirection, theme]);
+  }, [setColorScheme, updateFileContent, setDirection, theme]);
 
   React.useEffect(() => {
     setColorScheme(theme);

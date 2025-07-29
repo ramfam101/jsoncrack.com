@@ -1,10 +1,10 @@
 import toast from "react-hot-toast";
-import useFile from "../store/useFile";
+import { useFile } from "../store/useFile";
 import useJson from "../store/useJson";
 
 const useJsonQuery = () => {
   const getJson = useJson(state => state.getJson);
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
 
   const transformer = async ({ value }) => {
     const { run } = await import("json_typegen_wasm");
@@ -16,7 +16,7 @@ const useJsonQuery = () => {
       const jq = await import("jq-web");
       const res = await jq.promised.json(JSON.parse(getJson()), query);
 
-      setContents({ contents: JSON.stringify(res, null, 2) });
+      updateFileContent({ contents: JSON.stringify(res, null, 2) });
       cb?.();
     } catch (error) {
       console.error(error);

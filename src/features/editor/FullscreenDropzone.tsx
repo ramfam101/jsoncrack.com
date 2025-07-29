@@ -4,10 +4,10 @@ import { Dropzone } from "@mantine/dropzone";
 import toast from "react-hot-toast";
 import { VscCircleSlash, VscFiles } from "react-icons/vsc";
 import { FileFormat } from "../../enums/file.enum";
-import useFile from "../../store/useFile";
+import { useFile } from "../../store/useFile";
 
 export const FullscreenDropzone = () => {
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
 
   return (
     <Dropzone.FullScreen
@@ -24,7 +24,7 @@ export const FullscreenDropzone = () => {
         const fileContent = await e[0].text();
         let fileExtension = e[0].name.split(".").pop() as FileFormat | undefined;
         if (!fileExtension) fileExtension = FileFormat.JSON;
-        setContents({ contents: fileContent, format: fileExtension, hasChanges: false });
+        updateFileContent({ contents: fileContent, format: fileExtension, hasChanges: false });
       }}
     >
       <Group

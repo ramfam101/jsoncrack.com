@@ -6,14 +6,15 @@ import { event as gaEvent } from "nextjs-google-analytics";
 import toast from "react-hot-toast";
 import { AiOutlineUpload } from "react-icons/ai";
 import type { FileFormat } from "../../../enums/file.enum";
-import useFile from "../../../store/useFile";
+import { useFile } from "../../../store/useFile";
 
 export const ImportModal = ({ opened, onClose }: ModalProps) => {
   const [url, setURL] = React.useState("");
   const [file, setFile] = React.useState<File | null>(null);
 
-  const setContents = useFile(state => state.setContents);
-  const setFormat = useFile(state => state.setFormat);
+  const contents = useFile(state => state.contents);
+  const updateFileFormat = useFile(state => state.updateFileFormat);
+  const updateFileContent = useFile(state => state.updateFileContent);
 
   const handleImportFile = () => {
     if (url) {
@@ -25,7 +26,7 @@ export const ImportModal = ({ opened, onClose }: ModalProps) => {
       return fetch(url)
         .then(res => res.json())
         .then(json => {
-          setContents({ contents: JSON.stringify(json, null, 2) });
+          updateFileContent({ contents: JSON.stringify(json, null, 2) });
           onClose();
         })
         .catch(() => toast.error("Failed to fetch JSON!"))
@@ -33,10 +34,10 @@ export const ImportModal = ({ opened, onClose }: ModalProps) => {
     } else if (file) {
       const lastIndex = file.name.lastIndexOf(".");
       const format = file.name.substring(lastIndex + 1);
-      setFormat(format as FileFormat);
+      updateFileFormat(format as FileFormat);
 
       file.text().then(text => {
-        setContents({ contents: text });
+        updateFileContent({ contents: text });
         setFile(null);
         setURL("");
         onClose();

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaPencilAlt} from "react-icons/fa";
 import NodeContentModal from "../../../../modals/NodeContentModal";
-import useFile from "../../../../../store/useFile";
+import { useFile } from "../../../../../store/useFile";
 import { setValueAtPath } from "../../../../../utils";
 
 interface GraphNodeProps {
@@ -11,13 +11,13 @@ interface GraphNodeProps {
 export default function GraphNode({path, value}: GraphNodeProps) {
     const [isOpen, setIsOpen] = useState(false);
     const jsonText = useFile((s) => s.contents);
-    const setJsonContents = useFile((s) => s.setContents);
+    const updateFileContent = useFile((s) => s.updateFileContent);
 
     function handleSave(edited: string) {
         try {
            const root = JSON.parse(jsonText);
            setValueAtPath(root, path, JSON.parse(edited));
-            setJsonContents({contents: JSON.stringify(root, null, 2)});
+            updateFileContent({contents: JSON.stringify(root, null, 2)});
             setIsOpen(false);
         } catch (err) {
             console.error("Invalid JSON in node edit", err);
