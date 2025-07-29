@@ -44,6 +44,7 @@ const initialStates: Graph = {
 
 interface GraphActions {
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
+  setNodeText: (newText: any) => void;
   setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
@@ -230,6 +231,21 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     if (canvas) {
       viewPort?.camera?.centerFitElementIntoView(canvas);
     }
+  },
+  setNodeText: (newText) => {
+    set(state => {
+      if (!state.selectedNode) return {};
+      // Update the selectedNode's text
+      const updatedNode = { ...state.selectedNode, text: newText };
+      // Update nodes array if needed
+      const updatedNodes = state.nodes.map(node =>
+        node.id === updatedNode.id ? updatedNode : node
+      );
+      return {
+        selectedNode: updatedNode,
+        nodes: updatedNodes,
+      };
+    });
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
