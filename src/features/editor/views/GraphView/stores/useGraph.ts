@@ -3,6 +3,7 @@ import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
 import { create } from "zustand";
 import { SUPPORTED_LIMIT } from "../../../../../constants/graph";
 import useJson from "../../../../../store/useJson";
+import useFile from "../../../../../store/useFile";
 import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
@@ -280,7 +281,14 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
 
           // Stringify and update the JSON in the store - without extra escaping
           const updatedJsonString = JSON.stringify(updatedJsonObj, null, 2);
+          
+          // Update both JSON store and File store to keep editor in sync
           useJson.getState().setJson(updatedJsonString);
+          useFile.getState().setContents({ 
+            contents: updatedJsonString, 
+            hasChanges: true,
+            skipUpdate: false  // Ensure the JSON is properly updated
+          });
           
           // Also rebuild the graph based on the updated JSON to ensure visualization is in sync
           get().setGraph(updatedJsonString);
