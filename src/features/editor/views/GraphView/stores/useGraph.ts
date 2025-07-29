@@ -66,6 +66,26 @@ interface GraphActions {
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
   ...initialStates,
+  // ...existing actions
+  updateNodeData: (newData: any) => {
+    const selectedNode = get().selectedNode;
+    if (selectedNode) {
+      set({
+        selectedNode: {
+          ...selectedNode,
+          text: newData, // Update the text property of the selected node
+        },
+      });
+
+      // Optionally, update the nodes array if needed
+      const updatedNodes = get().nodes.map((node) =>
+        node.id === selectedNode.id ? { ...node, text: newData } : node
+      );
+
+      set({ nodes: updatedNodes });
+    }
+  },
+  ...initialStates,
   toggleCollapseAll: collapseAll => {
     set({ collapseAll });
     get().collapseGraph();
