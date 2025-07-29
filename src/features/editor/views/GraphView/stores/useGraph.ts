@@ -21,7 +21,7 @@ export interface Graph {
   collapsedEdges: string[];
   collapsedParents: string[];
   selectedNode: NodeData | null;
-  selectedNodePath: string | null; // <-- Add this line
+  selectedNodePath: string | null;
   path: string;
   aboveSupportedLimit: boolean;
 }
@@ -39,14 +39,12 @@ const initialStates: Graph = {
   collapsedEdges: [],
   collapsedParents: [],
   selectedNode: null,
-  selectedNodePath: null, // <-- Add this line
+  selectedNodePath: null,
   path: "",
   aboveSupportedLimit: false,
 };
 
 interface GraphActions {
-  setGraph: (json?: string, options?: Partial<Graph>[]) => void;
-  setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
   setSelectedNode: (nodeData: NodeData) => void;
@@ -64,6 +62,8 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNode: (id: string, newText: NodeData["text"]) => void;
+  setLoading: (loading: boolean) => void; // <-- Add this line
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -239,6 +239,17 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateNode: (id, newText) => {
+    set(state => {
+      const nodes = state.nodes.map(node => (node.id === id ? { ...node, text: newText } : node));
+      // Also update selectedNode if it's the same node
+      const selectedNode =
+        state.selectedNode && state.selectedNode.id === id
+          ? { ...state.selectedNode, text: newText }
+          : state.selectedNode;
+      return { nodes, selectedNode };
+    });
+  },
 }));
 
 export default useGraph;
