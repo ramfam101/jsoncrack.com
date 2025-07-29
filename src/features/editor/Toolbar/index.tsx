@@ -5,9 +5,10 @@ import styled from "styled-components";
 import toast from "react-hot-toast";
 import { AiOutlineFullscreen } from "react-icons/ai";
 import { FaFireFlameCurved, FaGithub } from "react-icons/fa6";
-import { type FileFormat, formats } from "../../../enums/file.enum";
+import { FileFormat, formats } from "../../../enums/file.enum";
 import { JSONCrackLogo } from "../../../layout/JsonCrackLogo";
 import useFile from "../../../store/useFile";
+import { useModal } from "../../../store/useModal";
 import { FileMenu } from "./FileMenu";
 import { ToolsMenu } from "./ToolsMenu";
 import { ViewMenu } from "./ViewMenu";
@@ -45,6 +46,7 @@ function fullscreenBrowser() {
 export const Toolbar = () => {
   const setFormat = useFile(state => state.setFormat);
   const format = useFile(state => state.format);
+  const showImport = useModal(state => state.setVisible);
 
   return (
     <StyledTools>
@@ -58,7 +60,13 @@ export const Toolbar = () => {
           defaultValue="json"
           size="xs"
           value={format}
-          onChange={e => setFormat(e as FileFormat)}
+          onChange={value => {
+            if (value === FileFormat.XLSX) {
+              showImport("ImportModal", true);
+            } else {
+              setFormat(value as FileFormat);
+            }
+          }}
           miw={80}
           w={120}
           data={formats}
