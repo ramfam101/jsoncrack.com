@@ -1,11 +1,9 @@
-//import React from "react";
 import React, { useState, useEffect } from "react";
 import type { ModalProps } from "@mantine/core";
 import { Modal, Stack, Text, ScrollArea, Button, Group } from "@mantine/core";
 import { CodeHighlight } from "@mantine/code-highlight";
 import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import useJson from "../../../store/useJson";
-//import useFiles from "../../../store/useFiles";
 
 const dataToString = (data: any) => {
   const text = Array.isArray(data) ? Object.fromEntries(data) : data;
@@ -29,9 +27,9 @@ useEffect(() => {
 
   const handleSave = () => {
     try {
-      const jsonInst = JSON.parse(editValue); // validate and parse JSON
-      useGraph.getState().updateNode(path, jsonInst); // update graph node
-      setIsEditing(false); // exit edit mode
+      const jsonInst = JSON.parse(editValue);
+      useGraph.getState().updateNode(path, jsonInst);
+      setIsEditing(false);
     } catch (e) {
       alert("Invalid JSON format. Please correct it before saving.");
     }
@@ -45,7 +43,6 @@ useEffect(() => {
             <Text fz="xs" fw={500}>
               Content
             </Text>
-            {/* Button row inline and right-justified */}
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)} variant="outline" size="xs">
                 Edit
