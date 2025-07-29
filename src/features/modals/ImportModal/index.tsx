@@ -5,7 +5,7 @@ import { Dropzone } from "@mantine/dropzone";
 import { event as gaEvent } from "nextjs-google-analytics";
 import toast from "react-hot-toast";
 import { AiOutlineUpload } from "react-icons/ai";
-import type { FileFormat } from "../../../enums/file.enum";
+import { FileFormat } from "../../../enums/file.enum";
 import useFile from "../../../store/useFile";
 
 export const ImportModal = ({ opened, onClose }: ModalProps) => {
@@ -32,17 +32,38 @@ export const ImportModal = ({ opened, onClose }: ModalProps) => {
         .finally(() => toast.dismiss("toastFetch"));
     } else if (file) {
       const lastIndex = file.name.lastIndexOf(".");
-      const format = file.name.substring(lastIndex + 1);
-      setFormat(format as FileFormat);
-
-      file.text().then(text => {
-        setContents({ contents: text });
-        setFile(null);
-        setURL("");
-        onClose();
-      });
-
-      gaEvent("import_file", { label: format });
+      const ext = file.name.substring(lastIndex + 1).toLowerCase();
+      if (ext === FileFormat.XLSX) {
+        setFormat(FileFormat.CSV);
+        file
+          .arrayBuffer()
+          .then(arrayBuffer => {
+            import("xlsx").then(XLSX => {
+              const workbook = XLSX.read(arrayBuffer, { type: "array" });
+              const sheetName = workbook.SheetNames[0];
+              const sheet = workbook.Sheets[sheetName];
+              const csv = XLSX.utils.sheet_to_csv(sheet);
+              setContents({ contents: csv });
+              setFile(null);
+              setURL("");
+              onClose();
+            });
+          })
+          .catch(() => toast.error("Failed to parse XLSX file!"));
+      } else {
+        const format = ext as FileFormat;
+        setFormat(format);
+        file
+          .text()
+          .then(text => {
+            setContents({ contents: text });
+            setFile(null);
+            setURL("");
+            onClose();
+          })
+          .catch(() => toast.error("Failed to read " + ext + " file!"));
+      }
+      gaEvent("import_file", { label: ext });
     }
   };
 
@@ -78,11 +99,15 @@ export const ImportModal = ({ opened, onClose }: ModalProps) => {
               "text/csv",
               "application/xml",
               "application/toml",
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             ]}
           >
             <Stack justify="center" align="center" gap="sm" mih={220}>
               <AiOutlineUpload size={48} />
               <Text fw="bold">Drop here or click to upload files</Text>
+              <Text c="dimmed" fz="xs">
+                Note: XLSX files are internally parsed as CSV
+              </Text>
               <Text c="dimmed" fz="xs">
                 (Max 500 KB)
               </Text>
