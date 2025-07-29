@@ -235,9 +235,13 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   setNodeText: (newText) => {
     set(state => {
       if (!state.selectedNode) return {};
-      // Update the selectedNode's text
-      const updatedNode = { ...state.selectedNode, text: newText };
-      // Update nodes array if needed
+      const updatedNode = {
+        ...state.selectedNode,
+        text: newText,
+        displayText: typeof newText === "object" && newText !== null
+          ? newText.name || JSON.stringify(newText)
+          : String(newText),
+      };
       const updatedNodes = state.nodes.map(node =>
         node.id === updatedNode.id ? updatedNode : node
       );
