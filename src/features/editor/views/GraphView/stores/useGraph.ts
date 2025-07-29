@@ -73,6 +73,17 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   clearGraph: () => set({ nodes: [], edges: [], loading: false }),
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
+  updateNodeData: (id, newData) => {
+    const updatedNodes = get().nodes.map(node =>
+      node.id === id ? { ...node, text: newData } : node
+    );
+    set({ nodes: updatedNodes });
+
+    const selected = get().selectedNode;
+    if (selected?.id === id) {
+      set({ selectedNode: { ...selected, text: newData } });
+    }
+  },
   setSelectedNode: nodeData => set({ selectedNode: nodeData }),
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
