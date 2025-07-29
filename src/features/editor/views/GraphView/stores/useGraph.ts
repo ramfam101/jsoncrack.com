@@ -44,6 +44,7 @@ const initialStates: Graph = {
 
 interface GraphActions {
   setGraph: (json?: string, options?: Partial<Graph>[]) => void;
+  setNodeText: (newText: any) => void;
   setLoading: (loading: boolean) => void;
   setDirection: (direction: CanvasDirection) => void;
   setViewPort: (ref: ViewPort) => void;
@@ -73,7 +74,10 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   clearGraph: () => set({ nodes: [], edges: [], loading: false }),
   getCollapsedNodeIds: () => get().collapsedNodes,
   getCollapsedEdgeIds: () => get().collapsedEdges,
-  setSelectedNode: nodeData => set({ selectedNode: nodeData }),
+  setSelectedNode: nodeData => set({ 
+    selectedNode: nodeData, 
+    path: nodeData.path || "" // <-- Ensure path is set from the node
+  }),
   setGraph: (data, options) => {
     const { nodes, edges } = parser(data ?? useJson.getState().json);
 
@@ -230,6 +234,25 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
     if (canvas) {
       viewPort?.camera?.centerFitElementIntoView(canvas);
     }
+  },
+  setNodeText: (newText) => {
+    set(state => {
+      if (!state.selectedNode) return {};
+      const updatedNode = {
+        ...state.selectedNode,
+        text: newText,
+        displayText: typeof newText === "object" && newText !== null
+          ? newText.name || JSON.stringify(newText)
+          : String(newText),
+      };
+      const updatedNodes = state.nodes.map(node =>
+        node.id === updatedNode.id ? updatedNode : node
+      );
+      return {
+        selectedNode: updatedNode,
+        nodes: updatedNodes,
+      };
+    });
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
