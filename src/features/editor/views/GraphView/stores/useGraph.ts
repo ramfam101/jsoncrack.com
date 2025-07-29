@@ -234,40 +234,51 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
-  updateSelectedNode: newText => set(state => {
-    if (!state.selectedNode) return {};
+  updateSelectedNode: newText => {
+    const state = get();
+    if (!state.selectedNode) return;
 
-    // Parse the new text
-    let updatedText = JSON.parse(newText);
+    // Parse the new value
+    let updatedValue = JSON.parse(newText);
 
-    // If the node is an object, convert to [key, value][] format
+    // If the node is an object, convert to [key, value][] format for the graph
+    let valueForGraph = updatedValue;
     if (
       state.selectedNode.data?.type === "object" &&
-      updatedText &&
-      typeof updatedText === "object" &&
-      !Array.isArray(updatedText)
+      updatedValue &&
+      typeof updatedValue === "object" &&
+      !Array.isArray(updatedValue)
     ) {
-      updatedText = Object.entries(updatedText);
+      valueForGraph = Object.entries(updatedValue);
     }
 
-    // If the node is an array, ensure it's an array
-    if (state.selectedNode.data?.type === "array" && Array.isArray(updatedText)) {
-      // You may want to format array items if needed
+    // --- Update the root JSON in useJson ---
+    // Helper to update the value at the correct path in the root JSON
+    function updateJsonAtPath(obj: any, path: string | undefined, value: any) {
+      if (!path || path === "root") return value;
+      const keys = path.split(".").filter(k => k !== "root" && k !== "");
+      if (keys.length === 0) return value;
+      const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+      let temp = newObj;
+      for (let i = 0; i < keys.length - 1; i++) {
+        const k = keys[i];
+        temp[k] = Array.isArray(temp[k]) ? [...temp[k]] : { ...temp[k] };
+        temp = temp[k];
+      }
+      temp[keys[keys.length - 1]] = value;
+      return newObj;
     }
 
-    const updatedSelectedNode = { ...state.selectedNode, text: updatedText };
+    // Get and update the root JSON
+    const rootJsonString = useJson.getState().json;
+    const rootJson = typeof rootJsonString === "string" ? JSON.parse(rootJsonString) : rootJsonString;
+    const updatedJson = updateJsonAtPath(rootJson, state.selectedNode.path, updatedValue);
 
-    const updatedNodes = state.nodes.map(node =>
-      node.id === state.selectedNode!.id
-        ? { ...node, text: updatedText }
-        : node
-    );
+    // Update the root JSON in useJson (this will also call setGraph and update the graph)
+    useJson.getState().setJson(JSON.stringify(updatedJson, null, 2));
 
-    return {
-      selectedNode: updatedSelectedNode,
-      nodes: updatedNodes,
-    };
-  }),
+    // No need to manually update nodes/edges here, as setJson will trigger setGraph
+  },
 }));
 
 export default useGraph;
