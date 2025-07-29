@@ -8,10 +8,10 @@ import { FaChevronDown } from "react-icons/fa";
 import { VscLinkExternal } from "react-icons/vsc";
 import { FileFormat } from "../../../enums/file.enum";
 import useConfig from "../../../store/useConfig";
-import useFile from "../../../store/useFile";
+import { useFile } from "../../../store/useFile";
 
 export const SchemaModal = ({ opened, onClose }: ModalProps) => {
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
   const setJsonSchema = useFile(state => state.setJsonSchema);
   const darkmodeEnabled = useConfig(state => (state.darkmodeEnabled ? "vs-dark" : "light"));
   const [schema, setSchema] = React.useState(
@@ -58,7 +58,7 @@ export const SchemaModal = ({ opened, onClose }: ModalProps) => {
     try {
       const { JSONSchemaFaker } = await import("json-schema-faker");
       const data = JSONSchemaFaker.generate(JSON.parse(schema));
-      setContents({ contents: JSON.stringify(data, null, 2), format: FileFormat.JSON });
+      updateFileContent({ contents: JSON.stringify(data, null, 2), format: FileFormat.JSON });
 
       gaEvent("generate_schema_mock_data");
       onClose();

@@ -7,7 +7,7 @@ import { AiOutlineFullscreen } from "react-icons/ai";
 import { FaFireFlameCurved, FaGithub } from "react-icons/fa6";
 import { type FileFormat, formats } from "../../../enums/file.enum";
 import { JSONCrackLogo } from "../../../layout/JsonCrackLogo";
-import useFile from "../../../store/useFile";
+import { useFile } from "../../../store/useFile";
 import { FileMenu } from "./FileMenu";
 import { ToolsMenu } from "./ToolsMenu";
 import { ViewMenu } from "./ViewMenu";
@@ -43,7 +43,7 @@ function fullscreenBrowser() {
 }
 
 export const Toolbar = () => {
-  const setFormat = useFile(state => state.setFormat);
+  const updateFileFormat = useFile(state => state.updateFileFormat);
   const format = useFile(state => state.format);
 
   return (
@@ -58,7 +58,7 @@ export const Toolbar = () => {
           defaultValue="json"
           size="xs"
           value={format}
-          onChange={e => setFormat(e as FileFormat)}
+          onChange={e => updateFileFormat(e as FileFormat)}
           miw={80}
           w={120}
           data={formats}

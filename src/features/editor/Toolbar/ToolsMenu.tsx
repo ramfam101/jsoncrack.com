@@ -9,16 +9,16 @@ import { MdFilterListAlt } from "react-icons/md";
 import { SiJsonwebtokens } from "react-icons/si";
 import { VscSearchFuzzy, VscJson, VscGroupByRefType } from "react-icons/vsc";
 import { jsonToContent } from "../../../lib/utils/jsonAdapter";
-import useFile from "../../../store/useFile";
-import useJson from "../../../store/useJson";
 import { useModal } from "../../../store/useModal";
+import useJson from "../../../store/useJson";
+import { useFile } from "../../../store/useFile";
 import { StyledToolElement } from "./styles";
 
 export const ToolsMenu = () => {
-  const setVisible = useModal(state => state.setVisible);
-  const getJson = useJson(state => state.getJson);
-  const setContents = useFile(state => state.setContents);
-  const getFormat = useFile(state => state.getFormat);
+  const setVisible = useModal((state) => state.setVisible);
+  const getJson = useJson((state) => state.getJson);
+  const updateFileContent = useFile((state) => state.updateFileContent);
+  const getFileFormat = useFile((state) => state.getFileFormat);
 
   const randomizeData = async () => {
     try {
@@ -34,8 +34,11 @@ export const ToolsMenu = () => {
 
       // generate random data
       const randomJson = JSONSchemaFaker.generate(JSON.parse(jsonSchema));
-      const contents = await jsonToContent(JSON.stringify(randomJson, null, 2), getFormat());
-      setContents({ contents });
+      const contents = await jsonToContent(
+        JSON.stringify(randomJson, null, 2),
+        getFileFormat()
+      );
+      updateFileContent({ contents });
 
       gaEvent("randomize_data");
     } catch (error) {

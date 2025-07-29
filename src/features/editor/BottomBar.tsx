@@ -13,7 +13,7 @@ import {
   VscSyncIgnored,
 } from "react-icons/vsc";
 import useConfig from "../../store/useConfig";
-import useFile from "../../store/useFile";
+import { useFile } from "../../store/useFile";
 import useGraph from "./views/GraphView/stores/useGraph";
 
 const StyledBottomBar = styled.div`
@@ -84,7 +84,7 @@ export const BottomBar = () => {
   const toggleLiveTransform = useConfig(state => state.toggleLiveTransform);
   const liveTransformEnabled = useConfig(state => state.liveTransformEnabled);
   const error = useFile(state => state.error);
-  const setContents = useFile(state => state.setContents);
+  const updateFileContent = useFile(state => state.updateFileContent);
   const nodeCount = useGraph(state => state.nodes.length);
   const toggleFullscreen = useGraph(state => state.toggleFullscreen);
   const fullscreen = useGraph(state => state.fullscreen);
@@ -136,7 +136,7 @@ export const BottomBar = () => {
           <Text fz="xs">Live Transform</Text>
         </StyledBottomBarItem>
         {!liveTransformEnabled && (
-          <StyledBottomBarItem onClick={() => setContents({})} disabled={!!error}>
+          <StyledBottomBarItem onClick={() => updateFileContent({})} disabled={!!error}>
             <VscRunAll />
             Click to Transform
           </StyledBottomBarItem>
