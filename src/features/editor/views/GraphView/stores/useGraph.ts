@@ -50,7 +50,7 @@ interface GraphActions {
   setSelectedNode: (nodeData: NodeData) => void;
   focusFirstNode: () => void;
   expandNodes: (nodeId: string) => void;
-  updateSelectedNode: (newText: string | [string, string][]) => void;
+  updateSelectedNode: (nodeID: string, newText: string | [string, string][]) => void;
   expandGraph: () => void;
   collapseNodes: (nodeId: string) => void;
   collapseGraph: () => void;
@@ -159,22 +159,27 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
       graphCollapsed: !!get().collapsedNodes.concat(nodeIds).length,
     });
   },
-  updateSelectedNode: (newText) => {
-    // ######################################### TO BE IMPLEMENTED #########################################
-    // const selected = get().selectedNode;
-    // if (!selected) return;
+  updateSelectedNode: (targetId, newContent) => {
+  const { nodes: allNodes, selectedNode: activeNode } = get();
 
-    // const updatedNode = {
-    //   ...selected,
-    //   text: newText,  // now assigning proper type to text
-    // };
+  if (!activeNode) return;
 
-    // const updatedNodes = get().nodes.map(node =>
-    //   node.id === selected.id ? updatedNode : node
-    // );
+  const newNodeList = allNodes.map(item =>
+    item.id === targetId
+      ? { ...item, text: newContent }
+      : item
+  );
 
-    // set({ nodes: updatedNodes, selectedNode: updatedNode });
-  },
+  const updatedSelection =
+    activeNode.id === targetId
+      ? { ...activeNode, text: newContent }
+      : activeNode;
+
+  set({
+    nodes: newNodeList,
+    selectedNode: updatedSelection,
+  });
+},
   collapseGraph: () => {
     const edges = get().edges;
     const tos = edges.map(edge => edge.to);
