@@ -7,6 +7,7 @@ import useGraph from "../../editor/views/GraphView/stores/useGraph";
 import useFile from "../../../store/useFile";
 import useConfig from "../../../store/useConfig";
 import SaveEditor from "../../editor/SaveEditor";
+import styled from "styled-components";
 
 
 loader.config({
@@ -90,12 +91,12 @@ const setCancel = () => {
   return (
     <Modal title="Node Content" size="auto" opened={opened} onClose={onClose} centered>
       <Stack py="sm" gap="sm">
-        {!isEditing && (<button className="button" onClick={toggleEditing} style={{ alignSelf: "flex-end" }}>Edit</button>)}
+        {!isEditing && (<Button className="button" onClick={toggleEditing} style={{ alignSelf: "flex-end" }}>Edit</Button>)}
 
         {isEditing &&(
             <Stack gap="xs" align="flex-end" pr="sm">
-              <button className="button" onClick={setSave}> Save</button>
-              <button className="button" onClick={setCancel}> Cancel</button>
+              <Button className="button" onClick={setSave}> Save</Button>
+              <Button className="button" onClick={setCancel}> Cancel</Button>
             </Stack>
         )}
         <Stack gap="xs">
@@ -142,3 +143,19 @@ const setCancel = () => {
     </Modal>
   );
 };
+
+const Button = styled.button`
+  background-color: #4c6fafff;
+  color: white;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  alpha: 0.3;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
