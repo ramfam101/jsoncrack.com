@@ -3,6 +3,7 @@ import type { CanvasDirection } from "reaflow/dist/layout/elkLayout";
 import { create } from "zustand";
 import { SUPPORTED_LIMIT } from "../../../../../constants/graph";
 import useJson from "../../../../../store/useJson";
+import useFile from "../../../../../store/useFile";
 import type { EdgeData, NodeData } from "../../../../../types/graph";
 import { parser } from "../lib/jsonParser";
 import { getChildrenEdges } from "../lib/utils/getChildrenEdges";
@@ -62,6 +63,7 @@ interface GraphActions {
   centerView: () => void;
   clearGraph: () => void;
   setZoomFactor: (zoomFactor: number) => void;
+  updateNodeContent: (newContent: string) => void;
 }
 
 const useGraph = create<Graph & GraphActions>((set, get) => ({
@@ -233,6 +235,74 @@ const useGraph = create<Graph & GraphActions>((set, get) => ({
   },
   toggleFullscreen: fullscreen => set({ fullscreen }),
   setViewPort: viewPort => set({ viewPort }),
+  updateNodeContent: newContent => {
+    const selectedNode = get().selectedNode;
+    if (selectedNode) {
+      // Update the node's text
+      selectedNode.text = newContent;
+
+      // Update the nodes array
+      const updatedNodes = get().nodes.map(node =>
+        node.id === selectedNode.id ? { ...node, text: newContent } : node
+      );
+
+      // Update the JSON input if path exists
+      if (selectedNode.path) {
+        try {
+          // Parse the JSON string into an object
+          const updatedJsonObj = JSON.parse(useJson.getState().json);
+          // Filter out {Root} and empty segments from the path
+          const pathSegments = selectedNode.path
+            .split('.')
+            .filter(segment => segment !== '{Root}' && segment.length > 0);
+
+          if (pathSegments.length === 0) {
+            return;
+          }
+
+          let current = updatedJsonObj;
+          for (let i = 0; i < pathSegments.length - 1; i++) {
+            const key = pathSegments[i];
+            if (!current[key] || typeof current[key] !== 'object') {
+              current[key] = {};
+            }
+            current = current[key];
+          }
+
+          const lastSegment = pathSegments[pathSegments.length - 1];
+          if (current[lastSegment] !== undefined) {
+            // Handle renaming of the property
+            current[newContent] = current[lastSegment];
+            delete current[lastSegment];
+          } else {
+            // Assign new content if the key does not exist
+            current[newContent] = newContent;
+          }
+
+          // Stringify and update the JSON in the store - without extra escaping
+          const updatedJsonString = JSON.stringify(updatedJsonObj, null, 2);
+          
+          // Update both JSON store and File store to keep editor in sync
+          useJson.getState().setJson(updatedJsonString);
+          useFile.getState().setContents({ 
+            contents: updatedJsonString, 
+            hasChanges: true,
+            skipUpdate: false  // Ensure the JSON is properly updated
+          });
+          
+          // Also rebuild the graph based on the updated JSON to ensure visualization is in sync
+          get().setGraph(updatedJsonString);
+        } catch (e) {
+          console.error('Failed to update JSON:', e);
+        }
+      }
+
+      // Trigger state update (only updating selectedNode to avoid overriding graph changes)
+      set({
+        selectedNode: { ...selectedNode },
+      });
+    }
+  },
 }));
 
 export default useGraph;

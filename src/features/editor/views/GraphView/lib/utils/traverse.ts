@@ -3,6 +3,7 @@ import type { States, Graph } from "../jsonParser";
 import { addEdgeToGraph } from "./addEdgeToGraph";
 import { addNodeToGraph } from "./addNodeToGraph";
 import { calculateNodeSize } from "./calculateNodeSize";
+import useGraph from "../../stores/useGraph";
 
 type PrimitiveOrNullType = "boolean" | "string" | "number" | "null";
 
@@ -67,6 +68,12 @@ function handleHasChildren(
   myParentId?: string,
   parentType?: string
 ) {
+  // Validate states
+  if (typeof states.brothersNode !== "string" && !Array.isArray(states.brothersNode)) {
+    console.warn("Invalid brothersNode:", states.brothersNode);
+    states.brothersNode = ""; // Reset to a valid value
+  }
+  
   let parentId: string | undefined;
 
   if (type !== "property" && states.parentName !== "") {
@@ -80,6 +87,7 @@ function handleHasChildren(
       );
 
       if (findBrothersNode) {
+        const updateNodeContent = useGraph.getState().updateNodeContent;
         const findNodeIndex = graph.nodes.findIndex(e => e.id === findBrothersNode?.id);
 
         if (findNodeIndex !== -1) {
@@ -92,7 +100,7 @@ function handleHasChildren(
           foundNode.width = width;
           foundNode.height = height;
 
-          graph.nodes = modifyNodes;
+          updateNodeContent(String(foundNode.text)); // Trigger state update
           states.brothersNode = [];
         }
       } else {
