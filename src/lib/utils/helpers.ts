@@ -3,5 +3,6 @@ export function isIframe() {
     return window.self !== window.top;
   } catch (e) {
     return true;
+    
   }
 }
